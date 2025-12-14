@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Home, ChevronDown, User } from 'lucide-react'; // Đã thêm icon User
+import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 
 const Header: React.FC = () => {
@@ -35,44 +35,90 @@ const Header: React.FC = () => {
       {/* HEADER CHÍNH (DESKTOP) */}
       <header className="bg-[#C70101] text-white sticky top-0 z-40 pt-12 md:pt-0 shadow-md">
         
-        {/* Hàng 1: Logo + Search + User */}
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Hàng 1: Logo + Các nút đặc biệt + Search + User */}
+        <div className="container mx-auto px-6 py-5 flex flex-col lg:flex-row items-center justify-between gap-6">
           
-          {/* LOGO */}
+          {/* LOGO - TO HƠN */}
           <Link to="/" className="shrink-0">
-            {/* Thêm bg-white để logo nổi bật trên nền đỏ, chỉnh padding và bo góc */}
-            <div className="bg-white px-3 py-1.5 rounded shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105">
                <img 
                 alt="Tin tức 24h" 
                 src="https://cdn.24h.com.vn/images/2023/logo-24h-new.svg" 
-                className="h-8 md:h-10 w-auto object-contain" 
+                className="h-12 md:h-14 w-auto object-contain" 
               />
             </div>
           </Link>
 
+          {/* CÁC MỤC ĐẶC BIỆT - TO VÀ ĐẸP HƠN */}
+          <div className="hidden lg:flex items-center gap-3">
+            {/* Giá vàng */}
+            <a 
+              href="https://www.24h.com.vn/gia-vang-c584.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
+            >
+              <DollarSign size={18} className="group-hover:rotate-12 transition-transform" />
+              <span>Giá vàng</span>
+            </a>
+
+            {/* Cup C1 */}
+            <a 
+              href="https://www.24h.com.vn/bong-da/champions-league-c584e3524.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
+            >
+              <Trophy size={18} className="group-hover:rotate-12 transition-transform" />
+              <span>Cup C1</span>
+            </a>
+
+            {/* Đoán tỷ số */}
+            <a 
+              href="https://www.24h.com.vn/du-doan-ty-so-c685.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
+            >
+              <TrendingUp size={18} className="group-hover:rotate-12 transition-transform" />
+              <span>Đoán tỷ số</span>
+            </a>
+
+            {/* Lịch */}
+            <a 
+              href="https://www.24h.com.vn/lich-van-nien-c567.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
+            >
+              <Calendar size={18} className="group-hover:rotate-12 transition-transform" />
+              <span>Lịch</span>
+            </a>
+          </div>
+
           {/* CỤM SEARCH & USER */}
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            {/* Search Form - Làm nhỏ lại */}
-            <form onSubmit={handleSearch} className="relative w-full md:w-80 group">
+          <div className="flex items-center gap-5 w-full lg:w-auto">
+            {/* Search Form - LỚN VÀ ĐẸP HƠN */}
+            <form onSubmit={handleSearch} className="relative w-full md:w-96 group">
               <input
                 type="text"
                 placeholder="Tìm kiếm tin tức..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-4 pr-10 text-sm text-gray-800 bg-white border-2 border-transparent rounded-full outline-none focus:border-red-300 transition-all shadow-inner"
+                className="w-full h-12 pl-5 pr-12 text-base text-gray-800 bg-white border-2 border-white/20 rounded-full outline-none focus:border-white focus:ring-2 focus:ring-white/30 transition-all shadow-lg"
               />
               <button
                 type="submit"
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition shadow-sm"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all shadow-md"
               >
-                <Search size={16} />
+                <Search size={18} />
               </button>
             </form>
 
-            {/* User Icon */}
-            <button className="hidden md:flex flex-col items-center justify-center text-white/90 hover:text-white hover:bg-white/10 p-2 rounded-lg transition group">
-              <User size={24} className="group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium mt-0.5">Tài khoản</span>
+            {/* User Icon - LỚN HƠN */}
+            <button className="hidden md:flex flex-col items-center justify-center text-white hover:text-white hover:bg-white/15 px-4 py-2 rounded-xl transition-all group shadow-md hover:shadow-lg">
+              <User size={28} className="group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-semibold mt-1">Tài khoản</span>
             </button>
           </div>
         </div>
