@@ -52,15 +52,13 @@ const Header: React.FC = () => {
           {/* CÁC MỤC ĐẶC BIỆT - TO VÀ ĐẸP HƠN */}
           <div className="hidden lg:flex items-center gap-3">
             {/* Giá vàng */}
-            <a 
-              href="https://www.24h.com.vn/gia-vang-c584.html" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <Link 
+              to="/gia-vang"
               className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
             >
               <DollarSign size={18} className="group-hover:rotate-12 transition-transform" />
               <span>Giá vàng</span>
-            </a>
+            </Link>
 
             {/* Cup C1 */}
             <a 
