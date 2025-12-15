@@ -57,7 +57,8 @@ const GoldPricePage: React.FC = () => {
       // Extract available dates
       const dates = Array.from(new Set(
         data.map((p: GoldPrice) => new Date(p.updatedAt).toISOString().split('T')[0])
-      )).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+      )) as string[];
+      dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
       setAvailableDates(dates);
       
       // Filter by selected date
@@ -701,14 +702,14 @@ const GoldPricePage: React.FC = () => {
                   <XAxis 
                     dataKey="date" 
                     tick={{ fontSize: 12, fill: '#6b7280' }}
-                    tickFormatter={(value) => {
+                    tickFormatter={(value: string) => {
                       const parts = value.split('/');
                       return `${parts[0]}/${parts[1]}`;
                     }}
                   />
                   <YAxis 
                     tick={{ fontSize: 12, fill: '#6b7280' }}
-                    tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                    tickFormatter={(value: number) => `${(value / 1000000).toFixed(1)}M`}
                     domain={['dataMin - 2000000', 'dataMax + 2000000']}
                   />
                   <Tooltip 
@@ -718,8 +719,8 @@ const GoldPricePage: React.FC = () => {
                       borderRadius: '8px',
                       padding: '12px'
                     }}
-                    labelFormatter={(label) => `Ngày: ${label}`}
-                    formatter={(value: any, name: string) => [
+                    labelFormatter={(label: string) => `Ngày: ${label}`}
+                    formatter={(value: number, name: string) => [
                       `${formatPrice(value)}`,
                       name
                     ]}
