@@ -1,6 +1,6 @@
 // src/pages/GoldPricePage.tsx
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, RefreshCw, Newspaper, Calendar, Search } from 'lucide-react';
+import { TrendingUp, RefreshCw, Newspaper,} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -49,17 +49,18 @@ const GoldPricePage: React.FC = () => {
       const response = await fetch('http://localhost:8080/api/gold-prices');
       if (!response.ok) throw new Error('Không thể tải dữ liệu giá vàng');
       const data = await response.json();
+      console.log('Gold prices data:', data); // Debug
       setGoldPrices(data);
-      
+
       const grouped = groupPricesByType(data);
       setGroupedPrices(grouped);
-      
+
       if (grouped.length > 0 && !selectedGoldType) {
         setSelectedGoldType(`${grouped[0].goldType}-${grouped[0].company}`);
       }
-      
+
       prepareChartData(data);
-      
+
       if (data.length > 0) {
         setLastUpdate(new Date(data[0].crawledAt || data[0].updatedAt).toLocaleString('vi-VN'));
       }
@@ -74,20 +75,20 @@ const GoldPricePage: React.FC = () => {
 
   const prepareChartData = (prices: GoldPrice[]) => {
     if (!selectedGoldType || prices.length === 0) return;
-    
+
     const [goldType, company] = selectedGoldType.split('-');
-    
+
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
     const filteredPrices = prices
-      .filter(p => 
-        p.goldType === goldType && 
+      .filter(p =>
+        p.goldType === goldType &&
         p.company === company &&
         new Date(p.updatedAt) >= thirtyDaysAgo
       )
       .sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
-    
+
     const grouped = new Map<string, { buy: number[], sell: number[] }>();
-    
+
     filteredPrices.forEach(price => {
       const date = new Date(price.updatedAt).toLocaleDateString('vi-VN');
       if (!grouped.has(date)) {
@@ -96,26 +97,26 @@ const GoldPricePage: React.FC = () => {
       grouped.get(date)!.buy.push(price.buyPrice);
       grouped.get(date)!.sell.push(price.sellPrice);
     });
-    
+
     const chartData = Array.from(grouped.entries()).map(([date, prices]) => ({
       date,
       'Mua vào': Math.round(prices.buy.reduce((a, b) => a + b, 0) / prices.buy.length),
       'Bán ra': Math.round(prices.sell.reduce((a, b) => a + b, 0) / prices.sell.length),
     }));
-    
+
     setChartData(chartData);
   };
 
   const groupPricesByType = (prices: GoldPrice[]): GroupedGoldPrice[] => {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    
+
     const grouped = new Map<string, GroupedGoldPrice>();
-    
+
     prices.forEach(price => {
       const key = `${price.goldType}-${price.company}`;
       const priceDate = new Date(price.updatedAt).toISOString().split('T')[0];
-      
+
       if (!grouped.has(key)) {
         grouped.set(key, {
           goldType: price.goldType,
@@ -123,16 +124,16 @@ const GoldPricePage: React.FC = () => {
           today: price,
         });
       }
-      
+
       const existing = grouped.get(key)!;
-      
+
       if (priceDate === today) {
         existing.today = price;
       } else if (priceDate === yesterday && !existing.yesterday) {
         existing.yesterday = price;
       }
     });
-    
+
     return Array.from(grouped.values());
   };
 
@@ -149,6 +150,9 @@ const GoldPricePage: React.FC = () => {
       });
       if (!response.ok) throw new Error('Không thể cập nhật giá vàng');
       await fetchGoldPrices();
+      if (goldPrices.length > 0) {
+        setLastUpdate(new Date().toLocaleString('vi-VN'));
+      }
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi');
@@ -186,12 +190,12 @@ const GoldPricePage: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -244,7 +248,7 @@ const GoldPricePage: React.FC = () => {
               <thead className="bg-gradient-to-r from-yellow-500 to-yellow-600">
                 <tr>
                   <th className="px-4 py-3 text-left text-sm font-bold text-white" rowSpan={2}>
-                    
+
                   </th>
                   <th className="px-4 py-3 text-center text-sm font-bold text-white border-b border-yellow-400" colSpan={2}>
                     Hôm nay ({new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })})
@@ -265,10 +269,10 @@ const GoldPricePage: React.FC = () => {
                   const buyDiff = calculateDifference(item.today.buyPrice, item.yesterday?.buyPrice);
                   const sellDiff = calculateDifference(item.today.sellPrice, item.yesterday?.sellPrice);
                   const goldKey = `${item.goldType}-${item.company}`;
-                  
+
                   return (
-                    <tr 
-                      key={index} 
+                    <tr
+                      key={index}
                       className={`hover:bg-yellow-50 transition-colors cursor-pointer ${
                         selectedGoldType === goldKey ? 'bg-yellow-100' : ''
                       }`}
@@ -332,7 +336,7 @@ const GoldPricePage: React.FC = () => {
               </tbody>
             </table>
           </div>
-          
+
           <div className="bg-blue-50 border-t border-blue-200 p-3">
             <p className="text-xs text-blue-800">
               Đơn vị: nghìn đồng/lượng | ▼ Tăng/giảm so sánh với ngày trước đó
@@ -364,7 +368,7 @@ const GoldPricePage: React.FC = () => {
                 {selectedGoldType ? selectedGoldType.split('-')[0] : 'Chọn loại vàng'}
                 <span className="float-right">▼</span>
               </button>
-              
+
               {showGoldDropdown && (
                 <div className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg max-h-96 overflow-hidden">
                   <input
@@ -376,8 +380,8 @@ const GoldPricePage: React.FC = () => {
                   />
                   <div className="overflow-y-auto max-h-80">
                     {groupedPrices
-                      .filter(item => 
-                        searchTerm === '' || 
+                      .filter(item =>
+                        searchTerm === '' ||
                         item.goldType.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         item.company.toLowerCase().includes(searchTerm.toLowerCase())
                       )
@@ -422,22 +426,22 @@ const GoldPricePage: React.FC = () => {
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tick={{ fontSize: 12, fill: '#6b7280' }}
                   tickFormatter={(value: string) => {
                     const parts = value.split('/');
                     return `${parts[0]}/${parts[1]}`;
                   }}
                 />
-                <YAxis 
+                <YAxis
                   tick={{ fontSize: 12, fill: '#6b7280' }}
                   tickFormatter={(value: number) => `${(value / 1000).toFixed(1)}M`}
                   domain={['dataMin - 1000', 'dataMax + 1000']}
                 />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px',
                     padding: '12px'
@@ -448,28 +452,28 @@ const GoldPricePage: React.FC = () => {
                     name
                   ]}
                 />
-                <Legend 
+                <Legend
                   verticalAlign="bottom"
                   align="center"
-                  wrapperStyle={{ 
+                  wrapperStyle={{
                     paddingTop: '30px',
                     paddingBottom: '10px'
                   }}
                   iconType="circle"
                   iconSize={10}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="Mua vào" 
-                  stroke="#ef4444" 
+                <Line
+                  type="monotone"
+                  dataKey="Mua vào"
+                  stroke="#ef4444"
                   strokeWidth={3}
                   dot={{ r: 4, fill: '#ef4444', strokeWidth: 2, stroke: '#fff' }}
                   activeDot={{ r: 6, fill: '#ef4444' }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="Bán ra" 
-                  stroke="#22c55e" 
+                <Line
+                  type="monotone"
+                  dataKey="Bán ra"
+                  stroke="#22c55e"
                   strokeWidth={3}
                   dot={{ r: 4, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }}
                   activeDot={{ r: 6, fill: '#22c55e' }}
@@ -495,17 +499,17 @@ const GoldPricePage: React.FC = () => {
             Tin tức về Vàng
           </h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
           {goldNews.length > 0 ? (
             goldNews.map((news) => (
-              <Link 
-                key={news.id} 
+              <Link
+                key={news.id}
                 to={`/news/${news.id}`}
                 className="flex gap-3 p-4 hover:bg-yellow-50 rounded-lg transition-colors border border-gray-200"
               >
                 {news.thumbnail && (
-                  <img 
+                  <img
                     src={news.thumbnail.includes('picsum.photos') ? `${news.thumbnail}?random=${news.id}` : news.thumbnail}
                     alt={news.title}
                     className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
@@ -527,7 +531,7 @@ const GoldPricePage: React.FC = () => {
           ) : (
             <div className="col-span-3 p-8 text-center">
               <p className="text-gray-500 text-sm">Chưa có tin tức về vàng</p>
-              <Link 
+              <Link
                 to="/category/gia-vang"
                 className="text-yellow-600 hover:text-yellow-700 font-semibold text-sm mt-2 inline-block"
               >
@@ -536,9 +540,9 @@ const GoldPricePage: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         <div className="bg-gray-50 px-6 py-3 border-t">
-          <Link 
+          <Link
             to="/category/gia-vang"
             className="text-yellow-600 hover:text-yellow-700 font-semibold text-sm flex items-center justify-center gap-1"
           >

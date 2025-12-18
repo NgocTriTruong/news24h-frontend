@@ -1,6 +1,7 @@
 import type { NewsArticle, PageResponse } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api/news';
+// const API_BASE_URL = 'http://localhost:8080/api/news';
+const API_BASE_URL = 'http://139.59.249.140:8080/api/news';
 
 export const newsApi = {
   // Lấy tin tức nổi bật

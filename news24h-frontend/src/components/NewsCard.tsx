@@ -46,7 +46,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
             <div className="flex items-center gap-3 mb-3">
-              <span className="px-3 py-1 bg-red-600 text-xs font-semibold rounded-full">
+              <span className="px-3 py-1 bg-[#78b43d] text-xs font-semibold rounded-full">
                 {getCategoryName(article.category)}
               </span>
               <div className="flex items-center gap-2 text-sm">
@@ -54,7 +54,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
                 <span>{formatDate(article.publishedAt)}</span>
               </div>
             </div>
-            <h2 className="text-2xl font-bold mb-2 line-clamp-2 group-hover:text-red-400 transition">
+            <h2 className="text-2xl font-bold mb-2 line-clamp-2 group-hover:text-[#78b43d] transition">
               {decodeHtml(article.title)}
             </h2>
             <p className="text-gray-200 line-clamp-2">{article.description}</p>
@@ -82,7 +82,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
         </div>
         <div className="sm:w-2/3 p-4">
           <div className="flex items-center gap-3 mb-2">
-            <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-semibold rounded">
+            <span className="px-2 py-1 bg-[#78b43d]/15 text-[#3c811e] text-xs font-semibold rounded">
               {getCategoryName(article.category)}
             </span>
             <div className="flex items-center gap-1 text-gray-500 text-xs">
@@ -90,7 +90,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
               <span>{formatDate(article.publishedAt)}</span>
             </div>
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition">
+          <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#78b43d] transition">
             {decodeHtml(article.title)}
           </h3>
           <p className="text-gray-600 text-sm line-clamp-3 mb-3">
