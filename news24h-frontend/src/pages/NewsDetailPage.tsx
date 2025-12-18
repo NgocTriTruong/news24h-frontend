@@ -6,12 +6,41 @@ import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';
 import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
 
+// const stopSpeak = () => {
+//   speechSynthesis.cancel();
+// };
+
 const NewsDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [relatedNews, setRelatedNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  let utterance: SpeechSynthesisUtterance | null = null;
+
+  // const speakText = (text: string) => {
+  //   if (!text) return;
+
+  //   speechSynthesis.cancel();
+
+  //   utterance = new SpeechSynthesisUtterance(text);
+  //   utterance.lang = "vi-VN";
+  //   utterance.rate = 1;
+  //   utterance.pitch = 1;
+
+  //   speechSynthesis.speak(utterance);
+  // };
+
+  useEffect(() => {
+    // Khi đổi bài → tắt giọng đọc
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+    setIsPaused(false);
+  }, [id]);
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
@@ -67,6 +96,54 @@ const NewsDetailPage: React.FC = () => {
     return txt.value;
   };
 
+  const htmlToPlainText = (html: string) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.innerText || div.textContent || '';
+  };
+
+  const handleSpeakToggle = () => {
+    if (!article) return;
+
+    // Nếu đang nghe → dừng
+    if (isSpeaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setIsPaused(false);
+      return;
+    }
+
+    // Nghe từ đầu
+    const text = htmlToPlainText(article.content);
+
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "vi-VN";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+
+    speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+    setIsPaused(false);
+  };
+
+
+  const handlePauseResume = () => {
+    if (!isSpeaking) return;
+
+    if (isPaused) {
+      speechSynthesis.resume();
+      setIsPaused(false);
+    } else {
+      speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -79,7 +156,7 @@ const NewsDetailPage: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-4 mb-4">
                   <Link
                     to={`/category/${article.category}`}
-                    className="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 transition"
+                    className="inline-flex items-center gap-2 px-3 py-1 bg-[#78b43d] text-white text-sm font-semibold rounded-full hover:bg-[#3c811e] transition"
                   >
                     <Tag size={14} />
                     {getCategoryName(article.category)}
@@ -98,6 +175,26 @@ const NewsDetailPage: React.FC = () => {
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                   {decodeHtml(article.title)}
                 </h1>
+
+                <div className="flex gap-3 mb-6">
+                  <button
+                    onClick={handleSpeakToggle}
+                    className={`px-4 py-2 rounded-lg text-white transition ${
+                      isSpeaking ? "bg-[#3c811e] hover:bg-[#2f6517]" : "bg-[#78b43d] hover:bg-[#3c811e]"
+                    }`}
+                  >
+                    {isSpeaking ? "🔊 Đang nghe..." : "🔊 Nghe tin"}
+                  </button>
+
+                  {isSpeaking && (
+                    <button
+                      onClick={handlePauseResume}
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                    >
+                      {isPaused ? "▶ Tiếp tục" : "⏸ Tạm dừng"}
+                    </button>
+                  )}
+                </div>
 
               </div>
 
@@ -143,7 +240,7 @@ const NewsDetailPage: React.FC = () => {
           {/* Sidebar - Related News */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-red-600">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#78b43d]">
                 Tin liên quan
               </h2>
               <div className="space-y-4">
@@ -163,7 +260,7 @@ const NewsDetailPage: React.FC = () => {
                         }}
                       />
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-gray-900 line-clamp-3 group-hover:text-red-600 transition">
+                        <h3 className="text-sm font-semibold text-gray-900 line-clamp-3 group-hover:text-[#78b43d] transition">
                           {decodeHtml(news.title)}
                         </h3>
                         <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">

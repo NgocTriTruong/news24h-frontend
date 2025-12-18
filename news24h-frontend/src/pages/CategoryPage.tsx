@@ -54,7 +54,7 @@ const CategoryPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Category Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 pb-3 border-b-4 border-red-600 inline-block">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 pb-3 border-b-4 border-[#78b43d] inline-block">
             {slug ? getCategoryName(slug) : 'Danh mục'}
           </h1>
         </div>
@@ -99,8 +99,8 @@ const CategoryPage: React.FC = () => {
                         onClick={() => setCurrentPage(pageNum)}
                         className={`w-10 h-10 rounded-lg ${
                           currentPage === pageNum
-                            ? 'bg-red-600 text-white font-bold'
-                            : 'bg-white border border-gray-300 hover:bg-gray-50'
+                            ? 'bg-[#78b43d] text-white font-bold'
+                            : 'bg-white border border-gray-300 hover:bg-[#78b43d]/10'
                         }`}
                       >
                         {pageNum + 1}

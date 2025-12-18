@@ -21,7 +21,7 @@ const GoldPricePage: React.FC = () => {
   const fetchGoldPrices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/gold-prices');
+      const response = await fetch('http://139.59.249.140:8080/api/gold-prices');
       if (!response.ok) throw new Error('Không thể tải dữ liệu giá vàng');
       const data = await response.json();
       console.log('Gold prices data:', data); // Debug
@@ -41,7 +41,7 @@ const GoldPricePage: React.FC = () => {
   const handleRefresh = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/gold-prices/refresh', {
+      const response = await fetch('http://139.59.249.140:8080/api/gold-prices/refresh', {
         method: 'POST',
       });
       if (!response.ok) throw new Error('Không thể cập nhật giá vàng');
