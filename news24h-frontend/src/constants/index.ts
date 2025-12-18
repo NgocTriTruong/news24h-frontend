@@ -21,7 +21,8 @@ export const CATEGORIES: Category[] = [
   { slug: 'du-lich', name: 'Du lịch' },
   { slug: 'suc-khoe-doi-song', name: 'Sức khỏe - Đời sống' },
   { slug: 'cong-nghe-thong-tin', name: 'Công nghệ thông tin' },
-  { slug: 'gia-vang', name: 'Giá Vàng' }
+  { slug: 'gia-vang', name: 'Giá Vàng' },
+  { slug: 'cup-c1', name: 'Cup C1' }
 ];
 
 export const getCategoryName = (slug: string): string => {

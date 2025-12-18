@@ -61,15 +61,13 @@ const Header: React.FC = () => {
             </Link>
 
             {/* Cup C1 */}
-            <a 
-              href="https://www.24h.com.vn/bong-da/champions-league-c584e3524.html" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <Link 
+              to="/cup-c1"
               className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
             >
               <Trophy size={18} className="group-hover:rotate-12 transition-transform" />
               <span>Cup C1</span>
-            </a>
+            </Link>
 
             {/* Đoán tỷ số */}
             <a 

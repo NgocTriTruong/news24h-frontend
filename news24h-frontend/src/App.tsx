@@ -7,6 +7,8 @@ import CategoryPage from './pages/CategoryPage';
 import NewsDetailPage from './pages/NewsDetailPage';
 import SearchPage from './pages/SearchPage';
 import GoldPricePage from './pages/GoldPricePage';
+import CupC1Page from './pages/CupC1Page';
+import FootballStandingsPage from './pages/FootballStandingsPage';
 
 const App: React.FC = () => {
   return (
@@ -20,6 +22,8 @@ const App: React.FC = () => {
             <Route path="/news/:id" element={<NewsDetailPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/gia-vang" element={<GoldPricePage />} />
+            <Route path="/cup-c1" element={<CupC1Page />} />
+            <Route path="/bxh" element={<FootballStandingsPage />} />
           </Routes>
         </main>
         <Footer />
