@@ -9,6 +9,8 @@ import SearchPage from './pages/SearchPage';
 import GoldPricePage from './pages/GoldPricePage';
 import CupC1Page from './pages/CupC1Page';
 import FootballStandingsPage from './pages/FootballStandingsPage';
+import FootballSchedulePage from './pages/FootballSchedulePage';
+import FootballResultsPage from './pages/FootballResultsPage';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +26,8 @@ const App: React.FC = () => {
             <Route path="/gia-vang" element={<GoldPricePage />} />
             <Route path="/cup-c1" element={<CupC1Page />} />
             <Route path="/bxh" element={<FootballStandingsPage />} />
+            <Route path="/lich-thi-dau" element={<FootballSchedulePage />} />
+            <Route path="/ket-qua" element={<FootballResultsPage />} />
           </Routes>
         </main>
         <Footer />

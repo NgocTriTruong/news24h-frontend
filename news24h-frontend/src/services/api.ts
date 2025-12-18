@@ -57,3 +57,61 @@ export const newsApi = {
     return response.json();
   },
 };
+
+// Football API
+interface FootballTeamResponse {
+  position: number;
+  teamName: string;
+  teamLogo: string;
+  matchesPlayed: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+  recentForm: string;
+}
+
+interface FootballTeam {
+  rank: number;
+  name: string;
+  logo: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+  recentForm: string;
+}
+
+const FOOTBALL_API_BASE_URL = 'http://localhost:8080/api/football';
+
+export const footballApi = {
+  // Lấy bảng xếp hạng theo giải đấu
+  getStandings: async (leagueId: string): Promise<FootballTeam[]> => {
+    const response = await fetch(`${FOOTBALL_API_BASE_URL}/${leagueId}/standings`);
+    if (!response.ok) throw new Error('Failed to fetch standings');
+    const data: FootballTeamResponse[] = await response.json();
+    
+    // Map backend response to frontend interface
+    return data.map(team => ({
+      rank: team.position,
+      name: team.teamName,
+      logo: team.teamLogo,
+      played: team.matchesPlayed,
+      won: team.wins,
+      drawn: team.draws,
+      lost: team.losses,
+      goalsFor: team.goalsFor,
+      goalsAgainst: team.goalsAgainst,
+      goalDifference: team.goalDifference,
+      points: team.points,
+      recentForm: team.recentForm
+    }));
+  },
+};

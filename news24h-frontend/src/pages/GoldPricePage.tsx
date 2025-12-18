@@ -506,7 +506,7 @@ const GoldPricePage: React.FC = () => {
               >
                 {news.thumbnail && (
                   <img 
-                    src={news.thumbnail} 
+                    src={news.thumbnail.includes('picsum.photos') ? `${news.thumbnail}?random=${news.id}` : news.thumbnail}
                     alt={news.title}
                     className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
                     onError={(e) => {

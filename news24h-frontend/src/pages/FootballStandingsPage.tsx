@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Calendar, ListFilter } from 'lucide-react';
+import { Trophy, TrendingUp, ListFilter } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { footballApi } from '../services/api';
 
 interface Team {
   rank: number;
   name: string;
   logo: string;
-  latestResult: string;
   played: number;
   won: number;
   drawn: number;
@@ -14,7 +15,7 @@ interface Team {
   goalsAgainst: number;
   goalDifference: number;
   points: number;
-  recentForm: ('W' | 'D' | 'L')[];
+  recentForm: string; // "WDLWW" format from backend
 }
 
 interface League {
@@ -24,174 +25,20 @@ interface League {
 }
 
 const FootballStandingsPage: React.FC = () => {
-  const [selectedLeague, setSelectedLeague] = useState('champions-league');
+  const [selectedLeague, setSelectedLeague] = useState('cup-c1');
   const [standings, setStandings] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [season, setSeason] = useState('2025/2026');
 
   const leagues: League[] = [
-    { id: 'premier-league', name: 'Ngoại hạng Anh', icon: '⚽' },
+    { id: 'ngoai-hang-anh', name: 'Ngoại hạng Anh', icon: '⚽' },
     { id: 'la-liga', name: 'La Liga', icon: '🇪🇸' },
-    { id: 'v-league-1', name: 'V.League 1', icon: '🇻🇳' },
+    { id: 'v-league', name: 'V.League 1', icon: '🇻🇳' },
     { id: 'serie-a', name: 'Serie A', icon: '🇮🇹' },
-    { id: 'champions-league', name: 'Champions League', icon: '🏆' },
+    { id: 'cup-c1', name: 'Champions League', icon: '🏆' },
     { id: 'bundesliga', name: 'Bundesliga', icon: '🇩🇪' },
     { id: 'ligue-1', name: 'Ligue 1', icon: '🇫🇷' },
-  ];
-
-  // Mock data - replace with API call
-  const mockStandings: Team[] = [
-    {
-      rank: 1,
-      name: 'Arsenal',
-      logo: '🔴',
-      latestResult: '3-0',
-      played: 6,
-      won: 6,
-      drawn: 0,
-      lost: 0,
-      goalsFor: 17,
-      goalsAgainst: 1,
-      goalDifference: 16,
-      points: 18,
-      recentForm: ['W', 'W', 'W', 'W', 'W']
-    },
-    {
-      rank: 2,
-      name: 'Bayern Munich',
-      logo: '🔴',
-      latestResult: '3-1',
-      played: 6,
-      won: 5,
-      drawn: 0,
-      lost: 1,
-      goalsFor: 18,
-      goalsAgainst: 7,
-      goalDifference: 11,
-      points: 15,
-      recentForm: ['W', 'L', 'W', 'W', 'W']
-    },
-    {
-      rank: 3,
-      name: 'Paris Saint-Germain',
-      logo: '🔵',
-      latestResult: '0-0',
-      played: 6,
-      won: 4,
-      drawn: 1,
-      lost: 1,
-      goalsFor: 19,
-      goalsAgainst: 8,
-      goalDifference: 11,
-      points: 13,
-      recentForm: ['D', 'W', 'L', 'W', 'W']
-    },
-    {
-      rank: 4,
-      name: 'Manchester City',
-      logo: '🔵',
-      latestResult: '2-1',
-      played: 6,
-      won: 4,
-      drawn: 1,
-      lost: 1,
-      goalsFor: 12,
-      goalsAgainst: 6,
-      goalDifference: 6,
-      points: 13,
-      recentForm: ['W', 'L', 'W', 'W', 'D']
-    },
-    {
-      rank: 5,
-      name: 'Atalanta',
-      logo: '⚫',
-      latestResult: '2-1',
-      played: 6,
-      won: 4,
-      drawn: 1,
-      lost: 1,
-      goalsFor: 8,
-      goalsAgainst: 6,
-      goalDifference: 2,
-      points: 13,
-      recentForm: ['W', 'W', 'D', 'L', 'W']
-    },
-    {
-      rank: 6,
-      name: 'Inter Milan',
-      logo: '⚫',
-      latestResult: '0-1',
-      played: 6,
-      won: 4,
-      drawn: 0,
-      lost: 2,
-      goalsFor: 12,
-      goalsAgainst: 4,
-      goalDifference: 8,
-      points: 12,
-      recentForm: ['L', 'L', 'W', 'W', 'W']
-    },
-    {
-      rank: 7,
-      name: 'Real Madrid',
-      logo: '⚪',
-      latestResult: '1-2',
-      played: 6,
-      won: 4,
-      drawn: 0,
-      lost: 2,
-      goalsFor: 13,
-      goalsAgainst: 7,
-      goalDifference: 6,
-      points: 12,
-      recentForm: ['L', 'W', 'L', 'W', 'W']
-    },
-    {
-      rank: 8,
-      name: 'Atlético de Madrid',
-      logo: '🔴',
-      latestResult: '3-2',
-      played: 6,
-      won: 4,
-      drawn: 0,
-      lost: 2,
-      goalsFor: 15,
-      goalsAgainst: 12,
-      goalDifference: 3,
-      points: 12,
-      recentForm: ['W', 'W', 'D', 'L', 'W']
-    },
-    {
-      rank: 9,
-      name: 'Liverpool',
-      logo: '🔴',
-      latestResult: '1-0',
-      played: 6,
-      won: 4,
-      drawn: 0,
-      lost: 2,
-      goalsFor: 11,
-      goalsAgainst: 8,
-      goalDifference: 3,
-      points: 12,
-      recentForm: ['W', 'L', 'W', 'W', 'L']
-    },
-    {
-      rank: 10,
-      name: 'Borussia Dortmund',
-      logo: '🟡',
-      latestResult: '2-2',
-      played: 6,
-      won: 3,
-      drawn: 2,
-      lost: 1,
-      goalsFor: 19,
-      goalsAgainst: 13,
-      goalDifference: 6,
-      points: 11,
-      recentForm: ['D', 'W', 'L', 'W', 'W']
-    },
   ];
 
   useEffect(() => {
@@ -201,18 +48,14 @@ const FootballStandingsPage: React.FC = () => {
   const fetchStandings = async () => {
     try {
       setLoading(true);
-      // Replace with actual API call
-      // const response = await fetch(`http://localhost:8080/api/football/standings/${selectedLeague}`);
-      // const data = await response.json();
-      // setStandings(data);
+      setError(null);
       
-      // Mock data for now
-      setTimeout(() => {
-        setStandings(mockStandings);
-        setLoading(false);
-      }, 500);
+      const data = await footballApi.getStandings(selectedLeague);
+      setStandings(data);
+      setLoading(false);
     } catch (err) {
-      setError('Không thể tải dữ liệu bảng xếp hạng');
+      console.error('Error fetching standings:', err);
+      setError('Không thể tải dữ liệu bảng xếp hạng. Vui lòng kiểm tra kết nối backend.');
       setLoading(false);
     }
   };
@@ -237,6 +80,21 @@ const FootballStandingsPage: React.FC = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen">
+        <div className="text-red-500 text-xl mb-4">⚠️ Lỗi tải dữ liệu</div>
+        <div className="text-gray-600 mb-4">{error}</div>
+        <button 
+          onClick={fetchStandings}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Thử lại
+        </button>
       </div>
     );
   }
@@ -295,16 +153,16 @@ const FootballStandingsPage: React.FC = () => {
         {/* Navigation Tabs */}
         <div className="bg-white rounded-lg shadow-md mb-6">
           <div className="flex border-b">
-            <button className="px-6 py-3 font-medium text-blue-600 border-b-2 border-blue-600">
+            <Link to="/lich-thi-dau" className="px-6 py-3 font-medium text-gray-600 hover:bg-gray-50">
               <div className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
                 <span>Lịch thi đấu</span>
               </div>
-            </button>
-            <button className="px-6 py-3 font-medium text-gray-600 hover:bg-gray-50">
+            </Link>
+            <button className="px-6 py-3 font-medium text-blue-600 border-b-2 border-blue-600">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
-                <span>Kết quả thi đấu</span>
+                <span>Bảng xếp hạng</span>
               </div>
             </button>
           </div>
@@ -318,7 +176,6 @@ const FootballStandingsPage: React.FC = () => {
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">TT</th>
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase">Đội</th>
-                  <th className="px-4 py-3 text-center text-xs font-bold uppercase">Kết quả<br/>mới nhất</th>
                   <th className="px-4 py-3 text-center text-xs font-bold uppercase">Trận</th>
                   <th className="px-4 py-3 text-center text-xs font-bold uppercase">Thắng</th>
                   <th className="px-4 py-3 text-center text-xs font-bold uppercase">Hòa</th>
@@ -352,14 +209,16 @@ const FootballStandingsPage: React.FC = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">{team.logo}</span>
+                        <img 
+                          src={team.logo} 
+                          alt={team.name}
+                          className="w-8 h-8 object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><circle cx="12" cy="12" r="10"/></svg>';
+                          }}
+                        />
                         <span className="font-semibold text-gray-900">{team.name}</span>
                       </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <span className="inline-block px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">
-                        {team.latestResult}
-                      </span>
                     </td>
                     <td className="px-4 py-4 text-center font-medium text-gray-700">{team.played}</td>
                     <td className="px-4 py-4 text-center font-medium text-green-600">{team.won}</td>
@@ -383,13 +242,13 @@ const FootballStandingsPage: React.FC = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-center gap-1">
-                        {team.recentForm.map((result, idx) => (
+                        {(team.recentForm || '').split('').filter(c => c === 'W' || c === 'D' || c === 'L').slice(-5).map((result, idx) => (
                           <div
                             key={idx}
-                            className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${getFormColor(result)}`}
+                            className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${getFormColor(result as 'W' | 'D' | 'L')}`}
                             title={result === 'W' ? 'Thắng' : result === 'D' ? 'Hòa' : 'Thua'}
                           >
-                            {getFormIcon(result)}
+                            {getFormIcon(result as 'W' | 'D' | 'L')}
                           </div>
                         ))}
                       </div>
