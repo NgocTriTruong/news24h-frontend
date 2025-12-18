@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
 
         {/* Other Headlines */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-red-600">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#78b43d]">
             Tin tức nổi bật
           </h2>
         </div>

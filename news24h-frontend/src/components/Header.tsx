@@ -86,14 +86,14 @@ const Header: React.FC = () => {
       </div>
 
       {/* HEADER CHÍNH (DESKTOP) */}
-      <header className="bg-[#C70101] text-white sticky top-0 z-40 pt-12 md:pt-0 shadow-md">
+      <header className="pt-12 md:pt-0 shadow-md">
         
         {/* Hàng 1: Logo + Các nút đặc biệt + Search + User */}
-        <div className="container mx-auto px-6 py-5 flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-6">
           
           {/* LOGO - TO HƠN */}
           <Link to="/" className="shrink-0">
-            <div className="bg-white px-5 py-3 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="bg-white px-5 py-3 rounded-lg transition-all duration-300">
                <img 
                 alt="Tin tức 24h" 
                 src="https://cdn.24h.com.vn/images/2023/logo-24h-new.svg" 
@@ -173,83 +173,83 @@ const Header: React.FC = () => {
               {/* Search Button */}
               <button
                 type="submit"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all shadow-md"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#78b43d] text-white rounded-full flex items-center justify-center hover:bg-[#3c811e] hover:scale-110 transition-all shadow-md"
               >
                 <Search size={18} />
               </button>
             </form>
 
             {/* User Icon - LỚN HƠN */}
-            <button className="hidden md:flex flex-col items-center justify-center text-white hover:text-white hover:bg-white/15 px-4 py-2 rounded-xl transition-all group shadow-md hover:shadow-lg">
-              <User size={28} className="group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-semibold mt-1">Tài khoản</span>
+            <button className="hidden md:flex flex-col items-center justify-center hover:bg-white/15 px-4 py-2 rounded-xl transition-all group">
+              <User size={22} className="transition-transform" />
+              <span className="group-hover:text-[#78b43d] text-xs font-semibold mt-1">Đăng nhập</span>
             </button>
           </div>
         </div>
 
-        {/* Hàng 2: MENU NGANG */}
-        <nav className="bg-[#a00000] border-t border-red-800/30">
-          <div className="max-w-7xl mx-auto">
-            <ul className="hidden md:flex items-center text-sm font-bold uppercase tracking-wide">
-              {/* Icon Home */}
-              <li>
+      </header>
+      {/* Hàng 2: MENU NGANG */}
+      <nav className="bg-[#78b43d] text-white sticky top-0 z-50 border-t border-green-800/30">
+        <div className="max-w-7xl mx-auto">
+          <ul className="hidden md:flex items-center text-sm font-bold uppercase tracking-wide">
+            {/* Icon Home */}
+            <li>
+              <Link
+                to="/"
+                className="flex items-center gap-2 px-4 py-3 hover:bg-[#3c811e] transition text-white/90 hover:text-white"
+              >
+                <Home size={20} />
+              </Link>
+            </li>
+
+            {/* Các mục menu chính */}
+            {visibleCategories.map((cat) => (
+              <li key={cat.slug}>
                 <Link
-                  to="/"
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-[#C70101] transition text-white/90 hover:text-white"
+                  to={`/category/${cat.slug}`}
+                  className="block px-4 py-3 hover:bg-[#3c811e] transition whitespace-nowrap text-white/90 hover:text-white"
                 >
-                  <Home size={18} />
+                  {cat.name}
                 </Link>
               </li>
+            ))}
 
-              {/* Các mục menu chính */}
-              {visibleCategories.map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    to={`/category/${cat.slug}`}
-                    className="block px-4 py-3 hover:bg-[#C70101] transition whitespace-nowrap text-white/90 hover:text-white"
+            {/* Dropdown Xem thêm */}
+            {hiddenCategories.length > 0 && (
+              <li className="relative ml-auto border-l border-green-800/30">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center gap-1 px-4 py-3 hover:bg-[#3c811e] transition text-white/90 hover:text-white"
+                >
+                  <Menu size={18} />
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDropdownOpen && (
+                  <div
+                    className="absolute top-full right-0 w-48 bg-white text-gray-800 shadow-xl rounded-b-lg overflow-hidden border-t-2 border-[#78b43d] z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                    onMouseLeave={() => setIsDropdownOpen(false)}
                   >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-
-              {/* Dropdown Xem thêm */}
-              {hiddenCategories.length > 0 && (
-                <li className="relative ml-auto border-l border-red-800/30">
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-1 px-4 py-3 hover:bg-[#C70101] transition text-white/90 hover:text-white"
-                  >
-                    <Menu size={18} />
-                    <ChevronDown size={14} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div
-                      className="absolute top-full right-0 w-48 bg-white text-gray-800 shadow-xl rounded-b-lg overflow-hidden border-t-2 border-red-600 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
-                      onMouseLeave={() => setIsDropdownOpen(false)}
-                    >
-                      <ul className="py-1">
-                        {hiddenCategories.map((cat) => (
-                          <li key={cat.slug}>
-                            <Link
-                              to={`/category/${cat.slug}`}
-                              className="block px-5 py-2.5 hover:bg-red-50 hover:text-red-600 transition text-sm font-semibold"
-                              onClick={() => setIsDropdownOpen(false)}
-                            >
-                              {cat.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </li>
-              )}
-            </ul>
-          </div>
-        </nav>
-      </header>
+                    <ul className="py-1">
+                      {hiddenCategories.map((cat) => (
+                        <li key={cat.slug}>
+                          <Link
+                            to={`/category/${cat.slug}`}
+                            className="block px-5 py-2.5 hover:bg-green-50 hover:text-green-600 transition text-sm font-semibold"
+                            onClick={() => setIsDropdownOpen(false)}
+                          >
+                            {cat.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </li>
+            )}
+          </ul>
+        </div>
+      </nav>
 
       {/* MOBILE DRAWER - Giữ nguyên */}
       {isMenuOpen && (

@@ -156,7 +156,7 @@ const NewsDetailPage: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-4 mb-4">
                   <Link
                     to={`/category/${article.category}`}
-                    className="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 transition"
+                    className="inline-flex items-center gap-2 px-3 py-1 bg-[#78b43d] text-white text-sm font-semibold rounded-full hover:bg-[#3c811e] transition"
                   >
                     <Tag size={14} />
                     {getCategoryName(article.category)}
@@ -180,7 +180,7 @@ const NewsDetailPage: React.FC = () => {
                   <button
                     onClick={handleSpeakToggle}
                     className={`px-4 py-2 rounded-lg text-white transition ${
-                      isSpeaking ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
+                      isSpeaking ? "bg-[#3c811e] hover:bg-[#2f6517]" : "bg-[#78b43d] hover:bg-[#3c811e]"
                     }`}
                   >
                     {isSpeaking ? "🔊 Đang nghe..." : "🔊 Nghe tin"}
@@ -240,7 +240,7 @@ const NewsDetailPage: React.FC = () => {
           {/* Sidebar - Related News */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-red-600">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-[#78b43d]">
                 Tin liên quan
               </h2>
               <div className="space-y-4">
@@ -260,7 +260,7 @@ const NewsDetailPage: React.FC = () => {
                         }}
                       />
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-gray-900 line-clamp-3 group-hover:text-red-600 transition">
+                        <h3 className="text-sm font-semibold text-gray-900 line-clamp-3 group-hover:text-[#78b43d] transition">
                           {decodeHtml(news.title)}
                         </h3>
                         <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
