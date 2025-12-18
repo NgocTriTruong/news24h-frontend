@@ -77,19 +77,16 @@ const Header: React.FC = () => {
               className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
             >
               <TrendingUp size={18} className="group-hover:rotate-12 transition-transform" />
-              <span>Đoán tỷ số</span>
             </a>
 
-            {/* Lịch */}
-            <a 
-              href="https://www.24h.com.vn/lich-van-nien-c567.html" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            {/* Lịch Vạn Niên */}
+            <Link 
+              to="/lich-van-nien"
               className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
             >
               <Calendar size={18} className="group-hover:rotate-12 transition-transform" />
               <span>Lịch</span>
-            </a>
+            </Link>
           </div>
 
           {/* CỤM SEARCH & USER */}

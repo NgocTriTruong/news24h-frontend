@@ -11,6 +11,7 @@ import CupC1Page from './pages/CupC1Page';
 import FootballStandingsPage from './pages/FootballStandingsPage';
 import FootballSchedulePage from './pages/FootballSchedulePage';
 import FootballResultsPage from './pages/FootballResultsPage';
+import LunarCalendarPage from './pages/LunarCalendarPage';
 
 const App: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const App: React.FC = () => {
             <Route path="/bxh" element={<FootballStandingsPage />} />
             <Route path="/lich-thi-dau" element={<FootballSchedulePage />} />
             <Route path="/ket-qua" element={<FootballResultsPage />} />
+            <Route path="/lich-van-nien" element={<LunarCalendarPage />} />
           </Routes>
         </main>
         <Footer />
