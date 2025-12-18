@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
 import { CATEGORIES } from '../constants';
@@ -8,6 +8,59 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+
+  //chuyen van bang tu giong noi
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = React.useRef<any>(null);
+
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      console.warn("Trình duyệt không hỗ trợ Speech Recognition");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "vi-VN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+
+      // Xóa dấu chấm, dấu hỏi, dấu phẩy ở cuối
+    const cleanedTranscript = transcript.trim().replace(/[.,!?]+$/g, '');
+
+      setSearchQuery(cleanedTranscript);
+      navigate(`/search?q=${encodeURIComponent(cleanedTranscript)}`);
+      setIsListening(false);
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+  }, [navigate]);
+
+  const handleVoiceSearch = () => {
+    if (!recognitionRef.current) return;
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +158,19 @@ const Header: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-12 pl-5 pr-12 text-base text-gray-800 bg-white border-2 border-white/20 rounded-full outline-none focus:border-white focus:ring-2 focus:ring-white/30 transition-all shadow-lg"
               />
+               {/* Voice Search Button */}
+              <button
+                type="button"
+                onClick={handleVoiceSearch}
+                className={`absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition ${
+                  isListening ? "bg-green-600 animate-pulse text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+                title="Tìm kiếm bằng giọng nói"
+              >
+                🎤
+              </button>
+
+              {/* Search Button */}
               <button
                 type="submit"
                 className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all shadow-md"
@@ -209,6 +275,17 @@ const Header: React.FC = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-4 pr-10 py-2 rounded-full text-gray-800 text-sm focus:ring-2 focus:ring-green-400 outline-none"
                 />
+
+                <button
+                  type="button"
+                  onClick={handleVoiceSearch}
+                  className={`absolute right-10 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full ${
+                    isListening ? "bg-white text-green-600 animate-pulse" : "bg-green-500 text-white"
+                  }`}
+                >
+                  🎤
+                </button>
+
                 <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-400">
                   <Search size={16} />
                 </button>
