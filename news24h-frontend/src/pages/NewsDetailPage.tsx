@@ -222,15 +222,13 @@ const NewsDetailPage: React.FC = () => {
                 {/* Source Link */}
                 {article.sourceUrl && (
                   <div className="mt-8 pt-6 border-t">
-                    <a
-                      href={article.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      to="/category/gia-vang"
                       className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
                     >
                       <ExternalLink size={18} />
-                      Xem bài gốc
-                    </a>
+                      Xem các tin tức khác về vàng
+                    </Link>
                   </div>
                 )}
               </div>
