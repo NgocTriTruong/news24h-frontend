@@ -15,8 +15,6 @@ import LunarCalendarPage from './pages/LunarCalendarPage';
 
 const App: React.FC = () => {
   
-  const [focusMode, setFocusMode] = React.useState(false);
-
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
