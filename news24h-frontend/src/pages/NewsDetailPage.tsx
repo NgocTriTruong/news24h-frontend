@@ -7,6 +7,7 @@ import { getCategoryName } from '../constants';
 import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
 import { MODE_CONFIG } from '../config/readingModes';
 import type { ReadingMode } from '../config/readingModes';
+import ArticleSummary from "../components/ArticleSummary";
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -224,8 +225,12 @@ const NewsDetailPage: React.FC = () => {
                   >
                     {readingMode === "dark" ? "🌙 Tắt Dark" : "🌙 Dark"}
                   </button>
+                </div>
 
+                {/* Article Summary */}
+                <ArticleSummary articleId={id!} />
 
+                <div className="flex gap-3 mb-6 mt-3">
                   <button
                     onClick={handleSpeakToggle}
                     className={`px-4 py-2 rounded-lg text-white transition ${
