@@ -132,6 +132,8 @@ export const footballApi = {
       points: team.points,
       recentForm: team.recentForm
     }));
+  }
+}
 /**
  * =========================
  * AI API
