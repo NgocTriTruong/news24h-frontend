@@ -12,6 +12,8 @@ import FootballStandingsPage from './pages/FootballStandingsPage';
 import FootballSchedulePage from './pages/FootballSchedulePage';
 import FootballResultsPage from './pages/FootballResultsPage';
 import LunarCalendarPage from './pages/LunarCalendarPage';
+import LoginPage from './pages/LoginPage';
+import ChatbotWidget from "./components/ChatbotWidget";
 
 const App: React.FC = () => {
   
@@ -23,6 +25,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/news/:id" element={<NewsDetailPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/gia-vang" element={<GoldPricePage />} />
@@ -34,6 +37,9 @@ const App: React.FC = () => {
           </Routes>
         </main>
         <Footer />
+
+        {/*  Chatbot – hiện ở mọi trang */}
+        <ChatbotWidget />
       </div>
     </Router>
   );

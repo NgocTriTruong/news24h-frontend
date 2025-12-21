@@ -1,7 +1,25 @@
+import axios from "axios";
 import type { NewsArticle, PageResponse } from '../types';
+import type { AiChatMessage, AiChatResponse, AiSummaryResponse } from "../types/ai";
+
+//  Axios instance (dùng cho AI)
+const api = axios.create({
+  // baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
+   baseURL: "http://139.59.249.140.nip.io:8080",
+}); 
+// attach token 
+api.interceptors.request.use((config) => {
+  const token =
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // const API_BASE_URL = 'http://localhost:8080/api/news';
-const API_BASE_URL = 'http://139.59.249.140:8080/api/news';
+const API_BASE_URL = 'http://139.59.249.140.nip.io:8080/api/news';
 
 export const newsApi = {
   // Lấy tin tức nổi bật
@@ -114,5 +132,31 @@ export const footballApi = {
       points: team.points,
       recentForm: team.recentForm
     }));
+  }
+}
+/**
+ * =========================
+ * AI API
+ * =========================
+ */
+export const aiApi = {
+  // Tóm tắt bài viết
+  summarize: async (articleId: string): Promise<AiSummaryResponse> => {
+    const res = await api.post("/api/ai/summarize", {
+      articleId,
+    });
+    return res.data;
+  },
+
+  // Chat AI
+  chat: async (
+    message: string,
+    history: AiChatMessage[]
+  ): Promise<AiChatResponse> => {
+    const res = await api.post("/api/ai/chat", {
+      message,
+      history,
+    });
+    return res.data;
   },
 };

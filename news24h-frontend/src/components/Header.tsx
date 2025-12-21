@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
+import LoginPage from '../pages/LoginPage';
 import { CATEGORIES } from '../constants';
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -174,8 +176,8 @@ const Header: React.FC = () => {
               </button>
             </form>
 
-            {/* User Icon - LỚN HƠN */}
-            <button className="hidden md:flex flex-col items-center justify-center hover:bg-white/15 px-4 py-2 rounded-xl transition-all group">
+            {/* User Icon - open login modal */}
+            <button onClick={() => setIsLoginOpen(true)} className="hidden md:flex flex-col items-center justify-center hover:bg-white/15 px-4 py-2 rounded-xl transition-all group">
               <User size={22} className="transition-transform" />
               <span className="group-hover:text-[#78b43d] text-xs font-semibold mt-1">Đăng nhập</span>
             </button>
@@ -289,6 +291,11 @@ const Header: React.FC = () => {
 
             <ul className="text-base font-medium py-2">
               <li>
+                <button onClick={() => { setIsLoginOpen(true); setIsMenuOpen(false); }} className="w-full text-left flex items-center gap-3 px-6 py-3 hover:bg-green-700 transition">
+                  <User size={18} /> Đăng nhập
+                </button>
+              </li>
+              <li>
                 <Link to="/" className="flex items-center gap-3 px-6 py-3 hover:bg-green-700 transition" onClick={() => setIsMenuOpen(false)}>
                   <Home size={18} /> Trang chủ
                 </Link>
@@ -308,6 +315,7 @@ const Header: React.FC = () => {
           </div>
         </>
       )}
+        {isLoginOpen && <LoginPage onClose={() => setIsLoginOpen(false)} />}
     </>
   );
 };
