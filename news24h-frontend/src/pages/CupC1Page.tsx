@@ -57,6 +57,7 @@ const CupC1Page: React.FC = () => {
         setLoading(true);
         setError(null);
         const response = await newsApi.getByCategory('cup-c1', 0, 8);
+        console.log('Cup C1 Articles:', response.content.map(a => ({ id: a.id, title: a.title.substring(0, 30), thumbnail: a.thumbnail })));
         setArticles(response.content);
       } catch (err) {
         setError('Không thể tải tin tức Cup C1.');
@@ -117,7 +118,7 @@ const CupC1Page: React.FC = () => {
               >
                 <div className="relative h-32 rounded-lg overflow-hidden mb-2">
                   <img 
-                    src={article.thumbnail.includes('picsum.photos') ? `${article.thumbnail}?random=${article.id}` : article.thumbnail}
+                    src={`${article.thumbnail}?cache=${article.id}`}
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     onError={(e) => {
@@ -159,7 +160,7 @@ const CupC1Page: React.FC = () => {
               >
                 <div className="relative h-32 rounded-lg overflow-hidden mb-2">
                   <img 
-                    src={article.thumbnail.includes('picsum.photos') ? `${article.thumbnail}?random=${article.id}` : article.thumbnail}
+                    src={`${article.thumbnail}?cache=${article.id}`}
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     onError={(e) => {
@@ -284,7 +285,7 @@ const CupC1Page: React.FC = () => {
                 >
                   {article.thumbnail && (
                     <img 
-                      src={article.thumbnail.includes('picsum.photos') ? `${article.thumbnail}?random=${article.id}` : article.thumbnail} 
+                      src={`${article.thumbnail}?t=${Date.now()}`} 
                       alt={article.title}
                       className="w-40 h-28 object-cover rounded-lg flex-shrink-0 group-hover:opacity-90 transition-opacity"
                       onError={(e) => {

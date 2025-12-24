@@ -7,6 +7,7 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const navigate = useNavigate();
 
   //chuyen van bang tu giong noi
@@ -122,15 +123,7 @@ const Header: React.FC = () => {
               <span>Cup C1</span>
             </Link>
 
-            {/* Đoán tỷ số */}
-            <a 
-              href="https://www.24h.com.vn/du-doan-ty-so-c685.html" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
-            >
-              <TrendingUp size={18} className="group-hover:rotate-12 transition-transform" />
-            </a>
+
 
             {/* Lịch Vạn Niên */}
             <Link 
@@ -199,13 +192,53 @@ const Header: React.FC = () => {
 
             {/* Các mục menu chính */}
             {visibleCategories.map((cat) => (
-              <li key={cat.slug}>
+              <li 
+                key={cat.slug}
+                className="relative"
+                onMouseEnter={() => setHoveredCategory(cat.slug)}
+                onMouseLeave={() => setHoveredCategory(null)}
+              >
                 <Link
-                  to={`/category/${cat.slug}`}
+                  to={
+                    cat.slug === 'bong-da' 
+                      ? '/category/serie-a' 
+                      : cat.subcategories && cat.subcategories.length > 0 
+                        ? `/category/${cat.subcategories[0].slug}` 
+                        : `/category/${cat.slug}`
+                  }
                   className="block px-4 py-3 hover:bg-[#3c811e] transition whitespace-nowrap text-white/90 hover:text-white"
                 >
                   {cat.name}
                 </Link>
+                
+                {/* Dropdown submenu */}
+                {cat.subcategories && cat.subcategories.length > 0 && hoveredCategory === cat.slug && (
+                  <div className={`absolute top-full left-0 bg-white text-gray-800 shadow-xl rounded-b-lg overflow-hidden border-t-2 border-[#78b43d] z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+                    cat.slug === 'bong-da' ? 'min-w-[700px] grid grid-cols-3 gap-x-2' : 'min-w-[220px]'
+                  }`}>
+                    <ul className={cat.slug === 'bong-da' ? 'py-2 col-span-3 grid grid-cols-3 gap-x-2' : 'py-1'}>
+                      {cat.subcategories.map((subcat) => {
+                        // Các trang đặc biệt không cần /category/
+                        const specialPages = ['lich-thi-dau', 'ket-qua', 'bxh'];
+                        const linkPath = specialPages.includes(subcat.slug) 
+                          ? `/${subcat.slug}` 
+                          : `/category/${subcat.slug}`;
+                        
+                        return (
+                          <li key={subcat.slug}>
+                            <Link
+                              to={linkPath}
+                              className="block px-5 py-2.5 hover:bg-green-50 hover:text-green-600 transition text-sm font-semibold"
+                              onClick={() => setHoveredCategory(null)}
+                            >
+                              {subcat.name}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
               </li>
             ))}
 
