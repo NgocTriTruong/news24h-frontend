@@ -15,6 +15,8 @@ import LunarCalendarPage from './pages/LunarCalendarPage';
 import LoginPage from './pages/LoginPage';
 import ChatbotWidget from "./components/ChatbotWidget";
 
+import OAuthCallback from "./pages/OAuthCallback";
+
 const App: React.FC = () => {
   
   return (
@@ -34,6 +36,8 @@ const App: React.FC = () => {
             <Route path="/lich-thi-dau" element={<FootballSchedulePage />} />
             <Route path="/ket-qua" element={<FootballResultsPage />} />
             <Route path="/lich-van-nien" element={<LunarCalendarPage />} />
+
+            <Route path="/oauth/callback" element={<OAuthCallback />} />
           </Routes>
         </main>
         <Footer />
