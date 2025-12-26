@@ -71,8 +71,8 @@ const Header: React.FC = () => {
     }
   };
 
-  const visibleCategories = CATEGORIES.slice(0, 8);
-  const hiddenCategories = CATEGORIES.slice(8);
+  const visibleCategories = CATEGORIES.slice(0, 9);
+  const hiddenCategories = CATEGORIES.slice(9);
 
   return (
     <>
@@ -219,7 +219,7 @@ const Header: React.FC = () => {
                     <ul className={cat.slug === 'bong-da' ? 'py-2 col-span-3 grid grid-cols-3 gap-x-2' : 'py-1'}>
                       {cat.subcategories.map((subcat) => {
                         // Các trang đặc biệt không cần /category/
-                        const specialPages = ['lich-thi-dau', 'ket-qua', 'bxh'];
+                        const specialPages = ['lich-thi-dau', 'ket-qua', 'bxh', 'top-ghi-ban'];
                         const linkPath = specialPages.includes(subcat.slug) 
                           ? `/${subcat.slug}` 
                           : `/category/${subcat.slug}`;

@@ -9,7 +9,7 @@ export const CATEGORIES: Category[] = [
       { slug: 'chinh-tri-xa-hoi', name: 'Chính trị - Xã hội' },
       { slug: 'ban-tre-cuoc-song', name: 'Bạn trẻ - Cuộc sống' },
       { slug: 'doi-song-dan-sinh', name: 'Đời sống - Dân sinh' },
-      { slug: 'giao-thong-do-thi', name: 'Giao thông - Đô thị' },
+      { slug: 'tai-nan-giao-thong', name: 'Tai nạn giao thông' },
       { slug: 'nong-tren-mang', name: 'Nóng trên mạng' },
       { slug: 'du-bao-thoi-tiet', name: 'Dự báo thời tiết' },
     ]
@@ -27,11 +27,8 @@ export const CATEGORIES: Category[] = [
       { slug: 'serie-a', name: 'Serie A' },
       { slug: 'bundesliga', name: 'Bundesliga' },
       { slug: 'v-league', name: 'V-League' },
-      { slug: 'tran-cau-dinh', name: 'Trận cầu đỉnh' },
       { slug: 'ngoi-sao-bong-da', name: 'Ngôi sao bóng đá' },
-      { slug: 'tin-van-bong-da', name: 'Điểm tin bóng đá' },
       { slug: 'chuyen-nhuong', name: 'Tin chuyển nhượng' },
-      { slug: 'doi-bong-noi-bat', name: 'Đội bóng nổi bật' },
     ]
   },
   { 
@@ -43,6 +40,10 @@ export const CATEGORIES: Category[] = [
       { slug: 'doanh-nghiep', name: 'Doanh nghiệp' },
       { slug: 'chung-khoan', name: 'Chứng khoán' },
       { slug: 'gia-vang', name: 'Giá vàng' },
+      { slug: 'bat-dong-san', name: 'Bất động sản' },
+      { slug: 'khoi-nghiep', name: 'Khởi nghiệp' },
+
+
     ]
   },
   { 
@@ -53,42 +54,55 @@ export const CATEGORIES: Category[] = [
       { slug: 'ca-nhac-mtv', name: 'Ca nhạc - MTV' },
       { slug: 'thoi-trang', name: 'Thời trang' },
       { slug: 'lam-dep', name: 'Làm đẹp' },
-    ]
-  },
-  { 
-    slug: 'the-thao', 
-    name: 'THỂ THAO',
-    subcategories: [
-      { slug: 'bong-da', name: 'Bóng đá' },
-      { slug: 'tennis', name: 'Tennis' },
-      { slug: 'cau-long', name: 'Cầu lông' },
-      { slug: 'the-thao-khac', name: 'Thể thao khác' },
+      { slug: 'doi-song-showbiz', name: 'Đời sống Showbiz' },
     ]
   },
   { 
     slug: 'suc-khoe', 
     name: 'SỨC KHỎE',
     subcategories: [
-      { slug: 'suc-khoe-doi-song', name: 'Sức khỏe - Đời sống' },
-      { slug: 'dinh-duong', name: 'Dinh dưỡng' },
-      { slug: 'lam-dep', name: 'Làm đẹp' },
+      { slug: 'suc-khoe-doi-song', name: 'Tin tức sức khỏe' },
+      { slug: 'dinh-duong', name: 'Sức khoẻ Dinh dưỡng' },
+      { slug: 'ung-thu', name: 'Ung thư' },
+      { slug: 'phat-minh-y-hoc', name: 'Phát minh y học' },
+      { slug: 'benh-phu-nu', name: 'Bệnh phụ nữ' },
+      { slug: 'benh-dan-ong', name: 'Bệnh đàn ông' },
+
     ]
   },
   { 
     slug: 'hi-tech', 
     name: 'HI-TECH',
     subcategories: [
-      { slug: 'cong-nghe-thong-tin', name: 'Công nghệ thông tin' },
-      { slug: 'thoi-trang-hi-tech', name: 'Thời trang - Hi-tech' },
       { slug: 'dien-thoai', name: 'Điện thoại' },
+      { slug: 'laptop-gia-re', name: 'Laptop' },
+      { slug: 'tin-tuc-cong-nghe', name: 'Tin tức công nghệ' },
+            { slug: 'may-tinh-de-ban', name: 'Máy tính để bàn' },
+      { slug: 'may-tinh-bang', name: 'Máy tính bảng' },
+      { slug: 'cac-san-pham-khac', name: 'Phụ kiện hi-tech' },
+      
+
     ]
   },
   { 
     slug: 'the-gioi', 
     name: 'THẾ GIỚI',
     subcategories: [
-      { slug: 'tin-the-gioi', name: 'Tin thế giới' },
+      { slug: 'diem-nong', name: 'Điểm nóng' },
       { slug: 'quan-su', name: 'Quân sự' },
+       { slug: 'theo-dong-lich-su', name: 'Theo dòng lịch sử' },
+    ]
+  },
+    { 
+    slug: 'the-thao', 
+    name: 'THỂ THAO',
+    subcategories: [
+      { slug: 'bong-da', name: 'Bóng đá' },
+      { slug: 'bong-chuyen', name: 'Bóng chuyền' },
+      { slug: 'tennis', name: 'Tennis' },
+      { slug: 'pickleball', name: 'Pickleball' },
+      { slug: 'bong-ro-nba-vba', name: 'Bóng rổ NBA' },
+      { slug: 'cac-mon-the-thao-khac', name: 'Thể thao khác' },
     ]
   },
   { 
