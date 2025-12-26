@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -18,6 +18,20 @@ import ChatbotWidget from "./components/ChatbotWidget";
 import OAuthCallback from "./pages/OAuthCallback";
 
 const App: React.FC = () => {
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "OAUTH_SUCCESS") {
+        localStorage.setItem("access_token", e.data.token);
+
+        // reload để header nhận trạng thái login
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
   
   return (
     <Router>

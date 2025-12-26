@@ -5,7 +5,7 @@ import type { AiChatMessage, AiChatResponse, AiSummaryResponse } from "../types/
 //  Axios instance (dùng cho AI)
 const api = axios.create({
   // baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
-   baseURL: "http://https://api.animalsfeeds.online",
+   baseURL: "https://api.animalsfeeds.online",
 }); 
 // attach token 
 api.interceptors.request.use((config) => {
@@ -108,7 +108,7 @@ interface FootballTeam {
   recentForm: string;
 }
 
-const FOOTBALL_API_BASE_URL = 'http://localhost:8080/api/football';
+const FOOTBALL_API_BASE_URL = 'https://api.animalsfeeds.online/api/football';
 
 export const footballApi = {
   // Lấy bảng xếp hạng theo giải đấu
