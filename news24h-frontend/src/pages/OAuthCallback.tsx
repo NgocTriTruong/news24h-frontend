@@ -1,15 +1,18 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const OAuthCallback = () => {
   const [params] = useSearchParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = params.get("token");
-    if (token) {
-      localStorage.setItem("access_token", token);
-      window.close(); // đóng tab login
+
+    if (token && window.opener) {
+      window.opener.postMessage(
+        { type: "OAUTH_SUCCESS", token },
+        "*"
+      );
+      window.close();
     }
   }, []);
 
