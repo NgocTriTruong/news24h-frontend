@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { authApi } from "../services/auth";
 
 interface LoginPageProps {
   onClose?: () => void;
@@ -31,14 +32,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
 
         {/* TITLE */}
         <h2 className="text-center text-base font-medium text-gray-800 mb-6">
-          Đăng nhập 24h.com.vn bằng tài khoản
+          Đăng nhập 24h bằng tài khoản
         </h2>
 
         {/* BUTTONS */}
         <div className="space-y-3">
           {/* GOOGLE */}
           <button
-            onClick={() => (window.location.href = '/auth/google')}
+            onClick={authApi.loginGoogle}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
           >
             <img
@@ -51,7 +52,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
 
           {/* FACEBOOK */}
           <button
-            onClick={() => (window.location.href = '/auth/facebook')}
+            onClick={authApi.loginFacebook}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
           >
             <img
@@ -64,7 +65,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
 
           {/* ZALO */}
           <button
-            onClick={() => (window.location.href = '/auth/zalo')}
+            onClick={authApi.loginZalo}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
           >
             <img

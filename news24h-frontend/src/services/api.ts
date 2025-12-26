@@ -5,7 +5,7 @@ import type { AiChatMessage, AiChatResponse, AiSummaryResponse } from "../types/
 //  Axios instance (dùng cho AI)
 const api = axios.create({
   // baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
-   baseURL: "http://139.59.249.140.nip.io:8080",
+   baseURL: "http://https://api.animalsfeeds.online",
 }); 
 // attach token 
 api.interceptors.request.use((config) => {
@@ -19,7 +19,7 @@ api.interceptors.request.use((config) => {
 });
 
 // const API_BASE_URL = 'http://localhost:8080/api/news';
-const API_BASE_URL = 'http://139.59.249.140.nip.io:8080/api/news';
+const API_BASE_URL = 'https://api.animalsfeeds.online/api/news';
 
 export const newsApi = {
   // Lấy tin tức nổi bật
