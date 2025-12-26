@@ -51,7 +51,7 @@ const App: React.FC = () => {
             <Route path="/ket-qua" element={<FootballResultsPage />} />
             <Route path="/lich-van-nien" element={<LunarCalendarPage />} />
 
-            <Route path="/oauth/callback" element={<OAuthCallback />} />
+            <Route path="/oauth2/callback" element={<OAuthCallback />} />
           </Routes>
         </main>
         <Footer />

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
 import LoginPage from '../pages/LoginPage';
 import { CATEGORIES } from '../constants';
+import { useAuth } from "../context/AuthContext";
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,6 +11,7 @@ const Header: React.FC = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
 
   //chuyen van bang tu giong noi
   const [isListening, setIsListening] = useState(false);
@@ -177,10 +179,47 @@ const Header: React.FC = () => {
             </form>
 
             {/* User Icon - open login modal */}
-            <button onClick={() => setIsLoginOpen(true)} className="hidden md:flex flex-col items-center justify-center hover:bg-white/15 px-4 py-2 rounded-xl transition-all group">
-              <User size={22} className="transition-transform" />
-              <span className="group-hover:text-[#78b43d] text-xs font-semibold mt-1">Đăng nhập</span>
-            </button>
+            {!isAuthenticated ? (
+              <button
+                onClick={() => setIsLoginOpen(true)}
+                className="hidden md:flex flex-col items-center hover:bg-white/15 px-4 py-2 rounded-xl"
+              >
+                <User size={22} />
+                <span className="text-xs font-semibold">Đăng nhập</span>
+              </button>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-white/20"
+                >
+                  <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <ChevronDown size={14} />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl z-50">
+                    <div className="px-4 py-3 border-b font-semibold">
+                      {user?.name}
+                    </div>
+                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
+                      Thông tin tài khoản
+                    </button>
+                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
+                      Tin bài đã lưu
+                    </button>
+                    <button
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                    >
+                      Thoát tài khoản
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
