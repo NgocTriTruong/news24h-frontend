@@ -12,9 +12,27 @@ import FootballStandingsPage from './pages/FootballStandingsPage';
 import FootballSchedulePage from './pages/FootballSchedulePage';
 import FootballResultsPage from './pages/FootballResultsPage';
 import LunarCalendarPage from './pages/LunarCalendarPage';
-import TopScorersPage from './pages/TopScorersPage';
+import { useEffect } from "react";
 
+// import LoginPage from './pages/LoginPage';
+import ChatbotWidget from "./components/ChatbotWidget";
+import OAuthCallback from "./pages/OAuthCallback";
 const App: React.FC = () => {
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "OAUTH_SUCCESS") {
+        localStorage.setItem("access_token", e.data.token);
+
+        // reload để header nhận trạng thái login
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
@@ -31,11 +49,16 @@ const App: React.FC = () => {
             <Route path="/lich-thi-dau" element={<FootballSchedulePage />} />
             <Route path="/ket-qua" element={<FootballResultsPage />} />
             <Route path="/lich-van-nien" element={<LunarCalendarPage />} />
-            <Route path="/top-ghi-ban" element={<TopScorersPage />} />
-            <Route path="/category/top-ghi-ban" element={<TopScorersPage />} />
+            {/*<Route path="/top-ghi-ban" element={<TopScorersPage />} />*/}
+            {/*<Route path="/category/top-ghi-ban" element={<TopScorersPage />} />*/}
+
+            <Route path="/oauth2/callback" element={<OAuthCallback />} />
           </Routes>
         </main>
         <Footer />
+
+        {/*  Chatbot – hiện ở mọi trang */}
+        <ChatbotWidget />
       </div>
     </Router>
   );

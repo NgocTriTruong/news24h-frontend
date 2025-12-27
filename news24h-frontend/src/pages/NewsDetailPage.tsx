@@ -5,6 +5,9 @@ import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';
 import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
+import { MODE_CONFIG } from '../config/readingModes';
+import type { ReadingMode } from '../config/readingModes';
+import ArticleSummary from "../components/ArticleSummary";
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -19,6 +22,12 @@ const NewsDetailPage: React.FC = () => {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+
+  const [readingMode, setReadingMode] = useState<ReadingMode>("normal");
+  const mode = MODE_CONFIG[readingMode];
+
+  const [isModeOpen, setIsModeOpen] = useState(false);
+
 
   let utterance: SpeechSynthesisUtterance | null = null;
 
@@ -102,6 +111,16 @@ const NewsDetailPage: React.FC = () => {
     return div.innerText || div.textContent || '';
   };
 
+
+  const toggleFocusMode = () => {
+    setReadingMode((prev) => (prev === "focus" ? "normal" : "focus"));
+  };
+
+  const toggleDarkMode = () => {
+    setReadingMode((prev) => (prev === "dark" ? "normal" : "dark"));
+  };
+
+
   const handleSpeakToggle = () => {
     if (!article) return;
 
@@ -144,16 +163,21 @@ const NewsDetailPage: React.FC = () => {
     }
   };
 
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    // <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen transition-colors duration-300 ${mode.container}`}>
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> */}
+        <div className={`grid gap-8 ${mode.grid}`}>
           {/* Main Content */}
-          <div className="lg:col-span-2">
-            <article className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* <div className="lg:col-span-2"> */}
+          <div className={mode.article}>
+            <article className={`rounded-lg shadow-lg overflow-hidden transition-colors duration-300 ${mode.container}`}>
               {/* Category & Meta Info */}
               <div className="px-6 pt-6">
                 <div className="flex flex-wrap items-center gap-4 mb-4">
+                  
                   <Link
                     to={`/category/${article.category}`}
                     className="inline-flex items-center gap-2 px-3 py-1 bg-[#78b43d] text-white text-sm font-semibold rounded-full hover:bg-[#3c811e] transition"
@@ -169,6 +193,7 @@ const NewsDetailPage: React.FC = () => {
                     <Eye size={16} />
                     <span>{article.viewCount} lượt xem</span>
                   </div>
+                  
                 </div>
 
                 {/* Title */}
@@ -177,6 +202,35 @@ const NewsDetailPage: React.FC = () => {
                 </h1>
 
                 <div className="flex gap-3 mb-6">
+
+                  <button
+                    onClick={toggleFocusMode}
+                    className={`px-4 py-2 rounded-lg transition ${
+                      readingMode === "focus"
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-gray-800 text-white hover:bg-black"
+                    }`}
+                  >
+                    {readingMode === "focus" ? "❌ Thoát Focus" : "🧘 Focus"}
+                  </button>
+
+                  {/* Dark toggle */}
+                  <button
+                    onClick={toggleDarkMode}
+                    className={`px-4 py-2 rounded-lg transition ${
+                      readingMode === "dark"
+                        ? "bg-yellow-500 text-black hover:bg-yellow-600"
+                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    }`}
+                  >
+                    {readingMode === "dark" ? "🌙 Tắt Dark" : "🌙 Dark"}
+                  </button>
+                </div>
+
+                {/* Article Summary */}
+                <ArticleSummary articleId={id!} />
+
+                <div className="flex gap-3 mb-6 mt-3">
                   <button
                     onClick={handleSpeakToggle}
                     className={`px-4 py-2 rounded-lg text-white transition ${
@@ -215,9 +269,10 @@ const NewsDetailPage: React.FC = () => {
               {/* Content */}
               <div className="px-6 pb-6">
                 <div
-                  className="prose prose-lg max-w-none"
+                  className={`prose max-w-none ${mode.prose}`}
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
+
 
                 {/* Source Link */}
                 {article.sourceUrl && (

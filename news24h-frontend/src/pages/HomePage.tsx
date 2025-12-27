@@ -6,11 +6,12 @@ import Loading from '../components/Loading';
 import { newsApi } from '../services/api';
 import { getCategoryName } from '../constants';
 import type { NewsArticle } from '../types';
-import '../styles/home.css';
 
+import '../styles/home.css';
 const HomePage: React.FC = () => {
   const [topHeadlines, setTopHeadlines] = useState<NewsArticle[]>([]);
   const [breakingNews, setBreakingNews] = useState<NewsArticle[]>([]);
+  // const [categoryNews, setCategoryNews] = useState<Record<string, NewsArticle[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -153,7 +154,7 @@ const HomePage: React.FC = () => {
                         {news.title.replace(/&#34;/g, '"')}
                       </a>
                       {index < breakingNews.length - 1 && (
-                        <span className="text-red-700">•</span>
+                        <span className="mx-4 text-red-700">•</span>
                       )}
                     </span>
                   ))}
