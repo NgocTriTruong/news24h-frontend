@@ -437,7 +437,10 @@ const GoldPricePage: React.FC = () => {
                 <YAxis
                   tick={{ fontSize: 12, fill: '#6b7280' }}
                   tickFormatter={(value: number) => `${(value / 1000).toFixed(1)}M`}
-                  domain={['dataMin - 1000', 'dataMax + 1000']}
+                  domain={[
+                    (dataMin: number) => Math.floor(dataMin - 200),
+                    (dataMax: number) => Math.ceil(dataMax + 200)
+                  ]}
                 />
                 <Tooltip
                   contentStyle={{
@@ -510,7 +513,7 @@ const GoldPricePage: React.FC = () => {
               >
                 {news.thumbnail && (
                   <img
-                    src={news.thumbnail.includes('picsum.photos') ? `${news.thumbnail}?random=${news.id}` : news.thumbnail}
+                    src={`${news.thumbnail}?cache=${news.id}`}
                     alt={news.title}
                     className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
                     onError={(e) => {

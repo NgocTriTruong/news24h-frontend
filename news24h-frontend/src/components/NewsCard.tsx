@@ -36,7 +36,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
       >
         <div className="relative h-96">
           <img
-            src={article.thumbnail}
+            src={`${article.thumbnail}?cache=${article.id}`}
             alt={decodeHtml(article.title)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
@@ -72,7 +72,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
       <div className="flex flex-col sm:flex-row">
         <div className="sm:w-1/3 h-48 sm:h-auto overflow-hidden">
           <img
-            src={article.thumbnail}
+            src={`${article.thumbnail}?cache=${article.id}`}
             alt={decodeHtml(article.title)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
