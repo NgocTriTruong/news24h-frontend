@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
+// import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
 import LoginPage from '../pages/LoginPage';
+import { Search, Menu, X, Home, ChevronDown, User, Trophy, Calendar, DollarSign } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAuth } from "../context/AuthContext";
 

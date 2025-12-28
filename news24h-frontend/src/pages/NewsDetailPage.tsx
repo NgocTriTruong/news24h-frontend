@@ -8,6 +8,8 @@ import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
 import { MODE_CONFIG } from '../config/readingModes';
 import type { ReadingMode } from '../config/readingModes';
 import ArticleSummary from "../components/ArticleSummary";
+import TextSettingsPanel from "../components/TextSettingsPanel";
+import type { TextSettings } from '../components/TextSettingsPanel';
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -27,6 +29,12 @@ const NewsDetailPage: React.FC = () => {
   const mode = MODE_CONFIG[readingMode];
 
   const [isModeOpen, setIsModeOpen] = useState(false);
+  const [textSettings, setTextSettings] = useState<TextSettings>({
+    fontSize: 16,
+    fontFamily: 'system',
+    textColor: '#000000',
+    lineHeight: 1.6,
+  });
 
 
   let utterance: SpeechSynthesisUtterance | null = null;
@@ -167,6 +175,7 @@ const NewsDetailPage: React.FC = () => {
   return (
     // <div className="min-h-screen bg-gray-50">
     <div className={`min-h-screen transition-colors duration-300 ${mode.container}`}>
+      <TextSettingsPanel onSettingsChange={setTextSettings} />
       <div className="container mx-auto px-4 py-8">
         {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> */}
         <div className={`grid gap-8 ${mode.grid}`}>
@@ -270,6 +279,15 @@ const NewsDetailPage: React.FC = () => {
               <div className="px-6 pb-6">
                 <div
                   className={`prose max-w-none ${mode.prose}`}
+                  style={{
+                    fontSize: `${textSettings.fontSize}px`,
+                    color: textSettings.textColor,
+                    lineHeight: textSettings.lineHeight,
+                    fontFamily: textSettings.fontFamily === 'system' ? 'inherit' : 
+                               textSettings.fontFamily === 'serif' ? 'Georgia, serif' :
+                               textSettings.fontFamily === 'mono' ? 'Courier New, monospace' :
+                               'inherit'
+                  }}
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
 

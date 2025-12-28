@@ -62,11 +62,35 @@ const CategoryPage: React.FC = () => {
         {/* Articles Grid */}
         {articles.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {articles.map((article) => (
-                <NewsCard key={article.id} article={article} />
-              ))}
+            {/* Featured + Side Articles */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Featured Article - Left Side (spans 1 column) */}
+              {articles.length > 0 && (
+                <div className="lg:col-span-1">
+                  <NewsCard article={articles[0]} featured={true} />
+                </div>
+              )}
+              
+              {/* Side Articles - Right Side (spans 2 columns) */}
+              <div className="lg:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {articles.slice(1, 5).map((article) => (
+                    <NewsCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* Related Articles Below */}
+            {articles.length > 5 && (
+              <div className="mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {articles.slice(5).map((article) => (
+                    <NewsCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
