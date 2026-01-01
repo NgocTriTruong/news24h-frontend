@@ -33,6 +33,8 @@ const NewsDetailPage: React.FC = () => {
   const [selectedWord, setSelectedWord] = useState<string>("");
   const [meanings, setMeanings] = useState<any[]>([]);
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
+  const [loadingMeaning, setLoadingMeaning] = useState(false);
+
 
   const [isModeOpen, setIsModeOpen] = useState(false);
   const [textSettings, setTextSettings] = useState<TextSettings>({
@@ -44,7 +46,8 @@ const NewsDetailPage: React.FC = () => {
 
 const lookupWord = async (word: string) => {
   try {
-
+    setLoadingMeaning(true);
+    setMeanings([]);
     const url = `/api/dictionary/lookup?word=${word}`;
 
     const res = await fetch(url);
@@ -58,6 +61,7 @@ const lookupWord = async (word: string) => {
     if(data.exists) {
       const result = data.results[0]
       setMeanings(result.meanings)
+      
     } else {
       setMeanings([
         {
@@ -70,9 +74,16 @@ const lookupWord = async (word: string) => {
 
   } catch (err) {
     console.error(err);
+  } finally {
+    setLoadingMeaning(false);
   }
 };
 
+const closePopup = () => {
+  setSelectedWord("");
+  setMeanings([]);
+  setLoadingMeaning(false);
+};
 
   // Set meta tags cho chia sẻ
   useEffect(() => {
@@ -362,6 +373,8 @@ const lookupWord = async (word: string) => {
                                'inherit'
                   }}
                   onMouseUp={(e) => {
+                    if (selectedWord || loadingMeaning) return;
+                    
                     const selection = window.getSelection();
                     const text = selection?.toString().trim();
 
@@ -377,8 +390,9 @@ const lookupWord = async (word: string) => {
                   <WordExplainPopup
                     word={selectedWord}
                     meanings={meanings}
+                    loading={loadingMeaning}
                     position={popupPos}
-                    onClose={() => setSelectedWord("")}
+                    onClose={closePopup}
                   />
 
                 {/* Source Link */}
