@@ -44,4 +44,5 @@ export interface PageResponse<T> {
 export interface Category {
   slug: string;
   name: string;
+  subcategories?: Category[];
 }

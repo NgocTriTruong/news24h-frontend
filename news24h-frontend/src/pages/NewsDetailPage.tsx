@@ -8,6 +8,9 @@ import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
 import { MODE_CONFIG } from '../config/readingModes';
 import type { ReadingMode } from '../config/readingModes';
 import ArticleSummary from "../components/ArticleSummary";
+import TextSettingsPanel from "../components/TextSettingsPanel";
+import type { TextSettings } from '../components/TextSettingsPanel';
+import ShareArticlePanel from "../components/ShareArticlePanel";
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -27,11 +30,58 @@ const NewsDetailPage: React.FC = () => {
   const mode = MODE_CONFIG[readingMode];
 
   const [isModeOpen, setIsModeOpen] = useState(false);
+  const [textSettings, setTextSettings] = useState<TextSettings>({
+    fontSize: 16,
+    fontFamily: 'system',
+    textColor: '#000000',
+    lineHeight: 1.6,
+  });
+
+  // Set meta tags cho chia sẻ
+  useEffect(() => {
+    if (article) {
+      document.title = article.title + ' - Tin tức 24h';
+      
+      // Remove old OG tags
+      const oldTags = document.querySelectorAll('meta[property^="og:"]');
+      oldTags.forEach(tag => tag.remove());
+
+      // Add OG meta tags
+      const createMetaTag = (property: string, content: string) => {
+        const meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        meta.setAttribute('content', content);
+        document.head.appendChild(meta);
+      };
+
+      createMetaTag('og:title', article.title);
+      createMetaTag('og:description', article.description);
+      createMetaTag('og:url', `${window.location.origin}/news/${article.id}`);
+      createMetaTag('og:type', 'article');
+      createMetaTag('og:site_name', 'Tin tức 24h');
+      if (article.thumbnail) {
+        createMetaTag('og:image', article.thumbnail);
+        createMetaTag('og:image:width', '1200');
+        createMetaTag('og:image:height', '630');
+      }
+    }
+  }, [article]);
 
 
   let utterance: SpeechSynthesisUtterance | null = null;
 
-  // const speakText = (text: string) => {
+  // Decode HTML entities in title
+  const decodeHtml = (html: string) => {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
+  };
+
+  const htmlToPlainText = (html: string) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.innerText || div.textContent || '';
+  };
   //   if (!text) return;
 
   //   speechSynthesis.cancel();
@@ -99,19 +149,6 @@ const NewsDetailPage: React.FC = () => {
     });
   };
 
-  const decodeHtml = (html: string) => {
-    const txt = document.createElement('textarea');
-    txt.innerHTML = html;
-    return txt.value;
-  };
-
-  const htmlToPlainText = (html: string) => {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.innerText || div.textContent || '';
-  };
-
-
   const toggleFocusMode = () => {
     setReadingMode((prev) => (prev === "focus" ? "normal" : "focus"));
   };
@@ -167,6 +204,7 @@ const NewsDetailPage: React.FC = () => {
   return (
     // <div className="min-h-screen bg-gray-50">
     <div className={`min-h-screen transition-colors duration-300 ${mode.container}`}>
+      <TextSettingsPanel onSettingsChange={setTextSettings} />
       <div className="container mx-auto px-4 py-8">
         {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> */}
         <div className={`grid gap-8 ${mode.grid}`}>
@@ -225,6 +263,13 @@ const NewsDetailPage: React.FC = () => {
                   >
                     {readingMode === "dark" ? "🌙 Tắt Dark" : "🌙 Dark"}
                   </button>
+
+                  {/* Share Button */}
+                  <ShareArticlePanel 
+                    title={decodeHtml(article.title)}
+                    url={`${window.location.origin}/news/${article.id}`}
+                    articleId={article.id.toString()}
+                  />
                 </div>
 
                 {/* Article Summary */}
@@ -272,6 +317,15 @@ const NewsDetailPage: React.FC = () => {
               <div className="px-6 pb-6">
                 <div
                   className={`prose max-w-none ${mode.prose}`}
+                  style={{
+                    fontSize: `${textSettings.fontSize}px`,
+                    color: textSettings.textColor,
+                    lineHeight: textSettings.lineHeight,
+                    fontFamily: textSettings.fontFamily === 'system' ? 'inherit' : 
+                               textSettings.fontFamily === 'serif' ? 'Georgia, serif' :
+                               textSettings.fontFamily === 'mono' ? 'Courier New, monospace' :
+                               'inherit'
+                  }}
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
 
