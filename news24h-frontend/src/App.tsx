@@ -17,6 +17,7 @@ import { useEffect } from "react";
 // import LoginPage from './pages/LoginPage';
 import ChatbotWidget from "./components/ChatbotWidget";
 import OAuthCallback from "./pages/OAuthCallback";
+import VoiceAssistant from "./components/VoiceAssistant";
 const App: React.FC = () => {
 
   useEffect(() => {
@@ -59,6 +60,7 @@ const App: React.FC = () => {
 
         {/*  Chatbot – hiện ở mọi trang */}
         <ChatbotWidget />
+        <VoiceAssistant />
       </div>
     </Router>
   );
