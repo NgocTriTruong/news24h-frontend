@@ -232,6 +232,7 @@ const NewsDetailPage: React.FC = () => {
 
                 <div className="flex gap-3 mb-6 mt-3">
                   <button
+                    id="btn-read-news"
                     onClick={handleSpeakToggle}
                     className={`px-4 py-2 rounded-lg text-white transition ${
                       isSpeaking ? "bg-[#3c811e] hover:bg-[#2f6517]" : "bg-[#78b43d] hover:bg-[#3c811e]"
@@ -242,6 +243,7 @@ const NewsDetailPage: React.FC = () => {
 
                   {isSpeaking && (
                     <button
+                      id="btn-pause-news"
                       onClick={handlePauseResume}
                       className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
                     >
