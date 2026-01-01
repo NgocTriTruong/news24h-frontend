@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
@@ -222,6 +223,16 @@ const Header: React.FC = () => {
       <nav className="bg-[#78b43d] text-white sticky top-0 z-50 border-t border-green-800/30">
         <div className="max-w-7xl mx-auto">
           <ul className="hidden md:flex items-center text-sm font-bold uppercase tracking-wide">
+            {/* Icon Menu 3 gạch */}
+            <li>
+              <button
+                onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
+                className="flex items-center gap-2 px-4 py-3 hover:bg-[#3c811e] transition text-white/90 hover:text-white"
+              >
+                <Menu size={20} />
+              </button>
+            </li>
+            
             {/* Icon Home */}
             <li>
               <Link
@@ -321,6 +332,69 @@ const Header: React.FC = () => {
         </div>
       </nav>
 
+      {/* MEGA MENU - Hiển thị xuống bên dưới */}
+      {isMegaMenuOpen && (
+        <div className="relative z-50">
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsMegaMenuOpen(false)} 
+          />
+          <div className="absolute top-full left-0 right-0 bg-white shadow-2xl z-50 relative" onClick={(e) => e.stopPropagation()}>
+            <div className="container mx-auto px-6 py-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-900">Danh mục tin tức</h2>
+                <button 
+                  onClick={() => setIsMegaMenuOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {CATEGORIES.map((category) => (
+                  <div key={category.slug} className="space-y-2">
+                    <h3 className="font-bold text-[#78b43d] text-xs uppercase border-b border-gray-200 pb-2">
+                      {category.name}
+                    </h3>
+                    {category.subcategories && category.subcategories.length > 0 ? (
+                      <ul className="space-y-1">
+                        {category.subcategories.map((subcat) => {
+                          const specialPages = ['lich-thi-dau', 'ket-qua', 'bxh', 'top-ghi-ban'];
+                          const linkPath = specialPages.includes(subcat.slug) 
+                            ? `/${subcat.slug}` 
+                            : `/category/${subcat.slug}`;
+                          
+                          return (
+                            <li key={subcat.slug} className="group">
+                              <Link
+                                to={linkPath}
+                                onClick={() => setIsMegaMenuOpen(false)}
+                                className="text-xs font-semibold text-gray-700 hover:text-[#78b43d] hover:bg-green-50 hover:underline block py-2 px-2 cursor-pointer transition-all duration-200 rounded"
+                              >
+                                {subcat.name}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <Link
+                        to={`/category/${category.slug}`}
+                        onClick={() => setIsMegaMenuOpen(false)}
+                        className="text-xs text-gray-600 hover:text-[#78b43d] hover:underline block py-1 cursor-pointer"
+                      >
+                        Xem tất cả
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MOBILE DRAWER - Giữ nguyên */}
       {isMenuOpen && (
         <>
@@ -389,6 +463,15 @@ const Header: React.FC = () => {
         </>
       )}
         {isLoginOpen && <LoginPage onClose={() => setIsLoginOpen(false)} />}
+        
+        <style>{`
+          a {
+            cursor: pointer;
+          }
+          .mega-menu-link:hover {
+            cursor: pointer;
+          }
+        `}</style>
     </>
   );
 };
