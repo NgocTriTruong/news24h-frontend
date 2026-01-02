@@ -54,7 +54,7 @@ const ShareArticlePanel: React.FC<ShareArticlePanelProps> = ({ title, url, artic
       {/* Share Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-[#78b43d] text-white rounded-lg hover:bg-[#3c811e] transition font-medium"
+        className="flex items-center gap-2 px-3 py-1 bg-[#78b43d] text-white rounded-lg hover:bg-[#3c811e] transition font-medium"
         title="Chia sẻ bài viết"
       >
         <Share2 size={18} />

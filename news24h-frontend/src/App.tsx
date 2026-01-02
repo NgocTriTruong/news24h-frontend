@@ -18,7 +18,10 @@ import { useEffect } from "react";
 import ChatbotWidget from "./components/ChatbotWidget";
 import OAuthCallback from "./pages/OAuthCallback";
 import VoiceAssistant from "./components/VoiceAssistant";
-
+import AccountPage from './pages/AccountPage';
+import SavedPage from './pages/SavedPage';
+import ViewedPage from './pages/ViewedPage';
+import AccountLinksPage from './pages/AccountLinksPage';
 const App: React.FC = () => {
 
   useEffect(() => {
@@ -51,6 +54,10 @@ const App: React.FC = () => {
             <Route path="/lich-thi-dau" element={<FootballSchedulePage />} />
             <Route path="/ket-qua" element={<FootballResultsPage />} />
             <Route path="/lich-van-nien" element={<LunarCalendarPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/saved" element={<SavedPage />} />
+            <Route path="/history" element={<ViewedPage />} />
+            <Route path="/link-account" element={<AccountLinksPage />} />
             {/*<Route path="/top-ghi-ban" element={<TopScorersPage />} />*/}
             {/*<Route path="/category/top-ghi-ban" element={<TopScorersPage />} />*/}
 
