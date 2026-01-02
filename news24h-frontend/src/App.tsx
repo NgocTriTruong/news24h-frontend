@@ -18,6 +18,7 @@ import { useEffect } from "react";
 import ChatbotWidget from "./components/ChatbotWidget";
 import OAuthCallback from "./pages/OAuthCallback";
 import VoiceAssistant from "./components/VoiceAssistant";
+
 const App: React.FC = () => {
 
   useEffect(() => {
