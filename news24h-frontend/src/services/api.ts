@@ -75,6 +75,13 @@ export const newsApi = {
     if (!response.ok) throw new Error('Failed to fetch breaking news');
     return response.json();
   },
+
+  // Lấy tin đọc nhiều nhất
+  getMostViewed: async (limit: number = 10): Promise<NewsArticle[]> => {
+    const response = await fetch(`${API_BASE_URL}/most-viewed?limit=${limit}`);
+    if (!response.ok) throw new Error('Failed to fetch most viewed news');
+    return response.json();
+  },
 };
 
 // Football API

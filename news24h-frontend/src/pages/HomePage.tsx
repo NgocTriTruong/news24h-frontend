@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Flame, TrendingUp } from 'lucide-react';
+import { Flame, TrendingUp, Eye } from 'lucide-react';
 import NewsCard from '../components/NewsCard';
 import Loading from '../components/Loading';
 import { newsApi } from '../services/api';
@@ -11,6 +11,7 @@ import '../styles/home.css';
 const HomePage: React.FC = () => {
   const [topHeadlines, setTopHeadlines] = useState<NewsArticle[]>([]);
   const [breakingNews, setBreakingNews] = useState<NewsArticle[]>([]);
+  const [mostViewedNews, setMostViewedNews] = useState<NewsArticle[]>([]);
   // const [categoryNews, setCategoryNews] = useState<Record<string, NewsArticle[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,16 @@ const HomePage: React.FC = () => {
         ]);
         setTopHeadlines(headlines);
         setBreakingNews(breaking);
+        
+        // Try to fetch most viewed news, but don't fail if endpoint doesn't exist
+        try {
+          const mostViewed = await newsApi.getMostViewed(15);
+          setMostViewedNews(mostViewed);
+        } catch (mvError) {
+          console.log('Most viewed endpoint not available yet:', mvError);
+          // Use top headlines as fallback
+          setMostViewedNews([]);
+        }
       } catch (err) {
         setError('Không thể tải tin tức. Vui lòng thử lại sau.');
         console.error('Error fetching news:', err);
@@ -63,7 +74,8 @@ const HomePage: React.FC = () => {
   const spotlightLeft = other.slice(0, 3);
   const spotlightRight = other.slice(3, 5);
   const mostRead = other.slice(5, 11);
-  const latestNews = other.slice(11, 25);
+  // Lấy tin mới từ topHeadlines, nếu không đủ thì lấy từ đầu
+  const latestNews = topHeadlines.length > 11 ? other.slice(11, 25) : topHeadlines.slice(0, 14);
 
   const renderCompactCard = (article: NewsArticle) => (
     <Link
@@ -99,7 +111,7 @@ const HomePage: React.FC = () => {
     </Link>
   );
 
-  const renderListCard = (article: NewsArticle) => (
+  const renderListCard = (article: NewsArticle, showViewCount: boolean = false) => (
     <Link
       key={article.id}
       to={`/news/${article.id}`}
@@ -123,6 +135,15 @@ const HomePage: React.FC = () => {
               {getCategoryName(article.category)}
             </span>
             <span>{formatDate(article.publishedAt)}</span>
+            {showViewCount && (
+              <>
+                <span className="w-1 h-1 bg-gray-300 rounded-full" />
+                <span className="flex items-center gap-1 text-red-500 font-semibold">
+                  <Eye size={14} />
+                  {article.viewCount?.toLocaleString() || 0}
+                </span>
+              </>
+            )}
           </div>
           <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#78b43d] transition">
             {decodeTitle(article.title)}
@@ -263,7 +284,7 @@ const HomePage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="section-title mb-4">Tin mới cập nhật</div>
             <div className="space-y-4">
-              {latestNews.map((article) => renderListCard(article))}
+              {latestNews.map((article) => renderListCard(article, false))}
             </div>
           </div>
           <div className="space-y-4">
