@@ -11,6 +11,7 @@ import ArticleSummary from "../components/ArticleSummary";
 import TextSettingsPanel from "../components/TextSettingsPanel";
 import type { TextSettings } from '../components/TextSettingsPanel';
 import ShareArticlePanel from "../components/ShareArticlePanel";
+import WordExplainPopup from '../components/WordExplainPopup';
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -29,6 +30,12 @@ const NewsDetailPage: React.FC = () => {
   const [readingMode, setReadingMode] = useState<ReadingMode>("normal");
   const mode = MODE_CONFIG[readingMode];
 
+  const [selectedWord, setSelectedWord] = useState<string>("");
+  const [meanings, setMeanings] = useState<any[]>([]);
+  const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
+  const [loadingMeaning, setLoadingMeaning] = useState(false);
+
+
   const [isModeOpen, setIsModeOpen] = useState(false);
   const [textSettings, setTextSettings] = useState<TextSettings>({
     fontSize: 16,
@@ -36,6 +43,47 @@ const NewsDetailPage: React.FC = () => {
     textColor: '#000000',
     lineHeight: 1.6,
   });
+
+const lookupWord = async (word: string) => {
+  try {
+    setLoadingMeaning(true);
+    setMeanings([]);
+    const url = `/api/dictionary/lookup?word=${word}`;
+
+    const res = await fetch(url);
+
+    if(!res.ok) return;
+
+    const data = await res.json();
+
+    console.log(data)
+
+    if(data.exists) {
+      const result = data.results[0]
+      setMeanings(result.meanings)
+      
+    } else {
+      setMeanings([
+        {
+          pos: "_",
+          definition: "Khong tim thay nghia",
+          source: "Dictionnary"
+        }
+      ])
+    }
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingMeaning(false);
+  }
+};
+
+const closePopup = () => {
+  setSelectedWord("");
+  setMeanings([]);
+  setLoadingMeaning(false);
+};
 
   // Set meta tags cho chia sẻ
   useEffect(() => {
@@ -326,9 +374,28 @@ const NewsDetailPage: React.FC = () => {
                                textSettings.fontFamily === 'mono' ? 'Courier New, monospace' :
                                'inherit'
                   }}
+                  onMouseUp={(e) => {
+                    if (selectedWord || loadingMeaning) return;
+                    
+                    const selection = window.getSelection();
+                    const text = selection?.toString().trim();
+
+                    if (text && text.split(" ").length <= 3) {
+                      setSelectedWord(text);
+                      setPopupPos({ x: e.clientX, y: e.clientY });
+                      lookupWord(text);
+                    }
+                  }}
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
-
+                
+                  <WordExplainPopup
+                    word={selectedWord}
+                    meanings={meanings}
+                    loading={loadingMeaning}
+                    position={popupPos}
+                    onClose={closePopup}
+                  />
 
                 {/* Source Link */}
                 {article.sourceUrl && (
@@ -385,6 +452,8 @@ const NewsDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+
     </div>
   );
 };
