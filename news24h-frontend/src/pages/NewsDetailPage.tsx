@@ -4,7 +4,7 @@ import { newsApi } from '../services/api';
 import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';
-import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
+import { Clock, Eye, Tag, ExternalLink, Bookmark } from 'lucide-react';
 import { MODE_CONFIG } from '../config/readingModes';
 import type { ReadingMode } from '../config/readingModes';
 import ArticleSummary from "../components/ArticleSummary";
@@ -26,6 +26,7 @@ const NewsDetailPage: React.FC = () => {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   const [readingMode, setReadingMode] = useState<ReadingMode>("normal");
   const mode = MODE_CONFIG[readingMode];
@@ -147,7 +148,37 @@ const closePopup = () => {
     speechSynthesis.cancel();
     setIsSpeaking(false);
     setIsPaused(false);
+    // cập nhật trạng thái saved khi đổi bài
+    const saved = localStorage.getItem('savedArticles');
+    try {
+      const arr = saved ? JSON.parse(saved) : [];
+      setIsSaved(arr.includes(id));
+    } catch {
+      setIsSaved(false);
+    }
   }, [id]);
+
+  const toggleSaveArticle = () => {
+    if (!article) return;
+    const key = 'savedArticles';
+    const raw = localStorage.getItem(key);
+    let arr: string[] = [];
+    try {
+      arr = raw ? JSON.parse(raw) : [];
+    } catch {
+      arr = [];
+    }
+
+    if (arr.includes(article.id.toString())) {
+      arr = arr.filter(x => x !== article.id.toString());
+      setIsSaved(false);
+    } else {
+      arr.push(article.id.toString());
+      setIsSaved(true);
+    }
+
+    localStorage.setItem(key, JSON.stringify(arr));
+  };
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
@@ -162,6 +193,21 @@ const closePopup = () => {
         ]);
         setArticle(newsData);
         setRelatedNews(related);
+        // Thêm vào lịch sử đã xem (localStorage)
+        try {
+          const key = 'viewedArticles';
+          const raw = localStorage.getItem(key);
+          let arr: string[] = raw ? JSON.parse(raw) : [];
+          const idStr = newsData.id.toString();
+          // loại bỏ nếu đã có rồi, đưa lên đầu
+          arr = arr.filter(x => x !== idStr);
+          arr.unshift(idStr);
+          // giữ tối đa 200 mục
+          if (arr.length > 200) arr = arr.slice(0, 200);
+          localStorage.setItem(key, JSON.stringify(arr));
+        } catch (e) {
+          // ignore
+        }
       } catch (err) {
         setError('Không thể tải chi tiết tin tức. Vui lòng thử lại sau.');
         console.error('Error fetching news detail:', err);
@@ -318,6 +364,15 @@ const closePopup = () => {
                     url={`${window.location.origin}/news/${article.id}`}
                     articleId={article.id.toString()}
                   />
+                  <button
+                    onClick={toggleSaveArticle}
+                    className={`px-4 py-2 rounded-lg transition border ${isSaved ? 'bg-yellow-400 text-white' : 'bg-white text-gray-800 hover:bg-gray-50'}`}
+                  >
+                    <div className="flex items-center gap-2">
+                        <Bookmark size={16} strokeWidth={2.5} />
+                        {isSaved ? 'Bỏ lưu bài' : 'Lưu bài'}
+                    </div>
+                  </button>
                 </div>
 
                 {/* Article Summary */}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 // import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
 import LoginPage from '../pages/LoginPage';
-import { Search, Menu, X, Home, ChevronDown, User, Trophy, Calendar, DollarSign } from 'lucide-react';
+import { Search, Menu, X, Home, ChevronDown, User, Trophy, Calendar, DollarSign, Bookmark, List, Link as LinkIcon, LogOut } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { useAuth } from "../context/AuthContext";
 
@@ -14,12 +14,34 @@ const Header: React.FC = () => {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const [savedCount, setSavedCount] = useState(0);
+  const [viewedCount, setViewedCount] = useState(0);
 
   //chuyen van bang tu giong noi
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = React.useRef<any>(null);
 
   useEffect(() => {
+    const readCounts = () => {
+      try {
+        const raw = localStorage.getItem('savedArticles');
+        setSavedCount(raw ? JSON.parse(raw).length : 0);
+      } catch { setSavedCount(0); }
+      try {
+        const rawV = localStorage.getItem('viewedArticles');
+        setViewedCount(rawV ? JSON.parse(rawV).length : 0);
+      } catch { setViewedCount(0); }
+    };
+
+    readCounts();
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'savedArticles' || e.key === 'viewedArticles') readCounts();
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
@@ -194,21 +216,58 @@ const Header: React.FC = () => {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl z-[9999]">
                     <div className="px-4 py-3 border-b font-semibold">
                       {user?.name}
                     </div>
-                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                      Thông tin tài khoản
-                    </button>
-                    <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                      Tin bài đã lưu
-                    </button>
+                    <Link to="/account" onClick={() => setIsDropdownOpen(false)} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                          <User size={16} strokeWidth={2.5} />
+                        </div>
+                        <span>Thông tin tài khoản</span>
+                      </div>
+                    </Link>
+                    <Link to="/saved" onClick={() => setIsDropdownOpen(false)} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                            <Bookmark size={16} strokeWidth={2.5} />
+                          </div>
+                          <span>Tin bài đã lưu</span>
+                        </div>
+                        <span className="ml-2 bg-red-500 text-white rounded-full px-2 text-xs">{savedCount}</span>
+                      </div>
+                    </Link>
+                    <Link to="/history" onClick={() => setIsDropdownOpen(false)} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                            <List size={16} strokeWidth={2.5} />
+                          </div>
+                          <span>Tin bài đã xem</span>
+                        </div>
+                        <span className="ml-2 bg-red-500 text-white rounded-full px-2 text-xs">{viewedCount}</span>
+                      </div>
+                    </Link>
+                    <Link to="/link-account" onClick={() => setIsDropdownOpen(false)} className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                       <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                          <LinkIcon size={16} strokeWidth={2.5} />
+                        </div>
+                        <span>Liên kết tài khoản</span>
+                      </div>
+                    </Link>
                     <button
                       onClick={logout}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
                     >
-                      Thoát tài khoản
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white">
+                          <LogOut size={16} strokeWidth={2.5} />
+                        </div>
+                        <span>Thoát tài khoản</span>
+                      </div>
                     </button>
                   </div>
                 )}
