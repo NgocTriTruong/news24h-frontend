@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { newsApi } from '../services/api';
+import { newsApi, footballApi } from '../services/api';
 import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { Trophy, ChevronRight, Clock } from 'lucide-react';
@@ -18,17 +18,9 @@ interface TeamStanding {
 
 const CupC1Page: React.FC = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [standings, setStandings] = useState<TeamStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Mock data cho bảng xếp hạng
-  const standings: TeamStanding[] = [
-    { rank: 1, team: 'Man City', logo: '🔵', played: 6, won: 5, drawn: 1, lost: 0, points: 16 },
-    { rank: 2, team: 'Bayern', logo: '🔴', played: 6, won: 4, drawn: 2, lost: 0, points: 14 },
-    { rank: 3, team: 'Real Madrid', logo: '⚪', played: 6, won: 4, drawn: 1, lost: 1, points: 13 },
-    { rank: 4, team: 'PSG', logo: '🔵', played: 6, won: 3, drawn: 2, lost: 1, points: 11 },
-    { rank: 5, team: 'Liverpool', logo: '🔴', played: 6, won: 3, drawn: 1, lost: 2, points: 10 },
-  ];
 
   const featuredMatches = [
     {
@@ -52,22 +44,41 @@ const CupC1Page: React.FC = () => {
   ];
 
   useEffect(() => {
-    const fetchCupC1News = async () => {
+    const fetchCupC1Data = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await newsApi.getByCategory('cup-c1', 0, 8);
-        console.log('Cup C1 Articles:', response.content.map(a => ({ id: a.id, title: a.title.substring(0, 30), thumbnail: a.thumbnail })));
-        setArticles(response.content);
+        
+        // Lấy tin tức và bảng xếp hạng song song
+        const [newsResponse, standingsData] = await Promise.all([
+          newsApi.getByCategory('cup-c1', 0, 8),
+          footballApi.getStandings('cup-c1')
+        ]);
+        
+        console.log('Cup C1 Articles:', newsResponse.content.map(a => ({ id: a.id, title: a.title.substring(0, 30), thumbnail: a.thumbnail })));
+        setArticles(newsResponse.content);
+        
+        // Map dữ liệu standings từ API về format cũ
+        const mappedStandings = standingsData.slice(0, 5).map(team => ({
+          rank: team.rank,
+          team: team.name,
+          logo: team.logo,
+          played: team.played,
+          won: team.won,
+          drawn: team.drawn,
+          lost: team.lost,
+          points: team.points
+        }));
+        setStandings(mappedStandings);
       } catch (err) {
-        setError('Không thể tải tin tức Cup C1.');
-        console.error('Error fetching Cup C1 news:', err);
+        setError('Không thể tải dữ liệu Cup C1.');
+        console.error('Error fetching Cup C1 data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCupC1News();
+    fetchCupC1Data();
     window.scrollTo(0, 0);
   }, []);
 
