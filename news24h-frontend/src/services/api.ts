@@ -2,82 +2,76 @@ import axios from "axios";
 import type { NewsArticle, PageResponse } from '../types';
 import type { AiChatMessage, AiChatResponse, AiSummaryResponse } from "../types/ai";
 
-//  Axios instance (dùng cho AI)
+// Lấy base URL từ environment variable
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+// Axios instance (dùng cho tất cả APIs)
 const api = axios.create({
-  // baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
-   baseURL: "https://api.animalsfeeds.online",
+  baseURL: API_BASE_URL,
 });
-// attach token
+
+// Attach token
 api.interceptors.request.use((config) => {
-  const token =
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// const API_BASE_URL = 'http://localhost:8080/api/news';
-const API_BASE_URL = 'https://api.animalsfeeds.online/api/news';
-
+// ==================== NEWS API ====================
 export const newsApi = {
-  // Lấy tin tức nổi bật
   getTopHeadlines: async (): Promise<NewsArticle[]> => {
-    const response = await fetch(`${API_BASE_URL}/top-headlines`);
-    if (!response.ok) throw new Error('Failed to fetch top headlines');
-    return response.json();
+    const response = await api.get("/api/news/top-headlines");
+    return response.data;
   },
 
-  // Lấy tin tức theo danh mục
   getByCategory: async (
     slug: string,
     page: number = 0,
     size: number = 10
   ): Promise<PageResponse<NewsArticle>> => {
-    const response = await fetch(
-      `${API_BASE_URL}/category/${slug}?page=${page}&size=${size}`
-    );
-    if (!response.ok) throw new Error('Failed to fetch category news');
-    return response.json();
+    const response = await api.get(`/api/news/category/${slug}`, {
+      params: { page, size }
+    });
+    return response.data;
   },
 
-  // Lấy chi tiết tin tức
   getById: async (id: string): Promise<NewsArticle> => {
-    const response = await fetch(`${API_BASE_URL}/${id}`);
-    if (!response.ok) throw new Error('Failed to fetch news detail');
-    return response.json();
+    const response = await api.get(`/api/news/${id}`);
+    return response.data;
   },
 
-  // Tìm kiếm tin tức
   search: async (
     query: string,
     page: number = 0,
     size: number = 10
   ): Promise<PageResponse<NewsArticle>> => {
-    const response = await fetch(
-      `${API_BASE_URL}/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`
-    );
-    if (!response.ok) throw new Error('Failed to search news');
-    return response.json();
+    const response = await api.get("/api/news/search", {
+      params: { query, page, size }
+    });
+    return response.data;
   },
 
-  // Lấy tin liên quan
   getRelated: async (id: string): Promise<NewsArticle[]> => {
-    const response = await fetch(`${API_BASE_URL}/${id}/related`);
-    if (!response.ok) throw new Error('Failed to fetch related news');
-    return response.json();
+    const response = await api.get(`/api/news/${id}/related`);
+    return response.data;
   },
 
-  // Lấy tin nóng
   getBreakingTicker: async (): Promise<NewsArticle[]> => {
-    const response = await fetch(`${API_BASE_URL}/breaking-ticker`);
-    if (!response.ok) throw new Error('Failed to fetch breaking news');
-    return response.json();
+    const response = await api.get("/api/news/breaking-ticker");
+    return response.data;
+  },
+
+  getMostViewed: async (limit: number = 10): Promise<NewsArticle[]> => {
+    const response = await api.get("/api/news/most-viewed", {
+      params: { limit }
+    });
+    return response.data;
   },
 };
 
-// Football API
+// ==================== FOOTBALL API ====================
 interface FootballTeamResponse {
   position: number;
   teamName: string;
@@ -108,16 +102,11 @@ interface FootballTeam {
   recentForm: string;
 }
 
-const FOOTBALL_API_BASE_URL = 'https://api.animalsfeeds.online/api/football';
-
 export const footballApi = {
-  // Lấy bảng xếp hạng theo giải đấu
   getStandings: async (leagueId: string): Promise<FootballTeam[]> => {
-    const response = await fetch(`${FOOTBALL_API_BASE_URL}/${leagueId}/standings`);
-    if (!response.ok) throw new Error('Failed to fetch standings');
-    const data: FootballTeamResponse[] = await response.json();
+    const response = await api.get(`/api/football/${leagueId}/standings`);
+    const data: FootballTeamResponse[] = response.data;
     
-    // Map backend response to frontend interface
     return data.map(team => ({
       rank: team.position,
       name: team.teamName,
@@ -133,30 +122,32 @@ export const footballApi = {
       recentForm: team.recentForm
     }));
   }
-}
-/**
- * =========================
- * AI API
- * =========================
- */
+};
+
+// ==================== AI API ====================
 export const aiApi = {
-  // Tóm tắt bài viết
   summarize: async (articleId: string): Promise<AiSummaryResponse> => {
-    const res = await api.post("/api/ai/summarize", {
-      articleId,
-    });
+    const res = await api.post("/api/ai/summarize", { articleId });
     return res.data;
   },
 
-  // Chat AI
   chat: async (
     message: string,
     history: AiChatMessage[]
   ): Promise<AiChatResponse> => {
-    const res = await api.post("/api/ai/chat", {
-      message,
-      history,
-    });
+    const res = await api.post("/api/ai/chat", { message, history });
     return res.data;
   },
 };
+
+
+// ================== COMMENT API ================
+
+export const getComments = (articleId: string) =>
+  api.get(`api/comments?articleId=${articleId}`);
+
+export const addComment = (data: {
+  articleId: string;
+  content: string;
+}) =>
+  api.post("api/comments", data);

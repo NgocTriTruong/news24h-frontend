@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { newsApi } from '../services/api';
+import { getComments, newsApi } from '../services/api';
 import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';
@@ -12,6 +12,7 @@ import TextSettingsPanel from "../components/TextSettingsPanel";
 import type { TextSettings } from '../components/TextSettingsPanel';
 import ShareArticlePanel from "../components/ShareArticlePanel";
 import WordExplainPopup from '../components/WordExplainPopup';
+import CommentSection from '../components/CommentSection';
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -34,6 +35,7 @@ const NewsDetailPage: React.FC = () => {
   const [meanings, setMeanings] = useState<any[]>([]);
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
   const [loadingMeaning, setLoadingMeaning] = useState(false);
+
 
 
   const [isModeOpen, setIsModeOpen] = useState(false);
@@ -394,6 +396,9 @@ const closePopup = () => {
                     position={popupPos}
                     onClose={closePopup}
                   />
+
+                  <CommentSection articleId={article.id} />
+
 
                 {/* Source Link */}
                 {article.sourceUrl && (
