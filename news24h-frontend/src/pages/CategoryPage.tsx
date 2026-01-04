@@ -80,6 +80,29 @@ const CategoryPage: React.FC = () => {
                 </div>
               </div>
             </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {articles.map((article, index) => (
+                <div key={article.id} className="relative group">
+                  {/* Thẻ div này dùng để AI định vị.
+                    Khi AI gọi lệnh click(), ta cần navigate. 
+                    Do NewsCard bên trong đã có Link, ta có thể tìm thẻ <a> bên trong div này để click
+                  */}
+                  <div className="news-item-trigger hidden" onClick={() => {
+                      // Tìm link bên trong và click
+                      const link = document.getElementById(`news-link-${article.id}`);
+                      link?.click();
+                  }}></div>
+
+                  {/* Hiển thị số thứ tự để người dùng dễ đọc */}
+                  <span className="absolute top-0 left-0 bg-[#78b43d] text-white text-xs font-bold px-2 py-1 z-10 rounded-tl-lg">
+                    #{index + 1}
+                  </span>
+                  
+                  {/* Truyền id cho NewsCard để tạo id cho thẻ Link */}
+                  <NewsCard article={article} customId={`news-link-${article.id}`} />
+                </div>
+              ))}
+            </div>
 
             {/* Related Articles Below */}
             {articles.length > 5 && (

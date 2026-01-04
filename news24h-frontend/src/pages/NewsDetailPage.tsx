@@ -4,13 +4,14 @@ import { newsApi } from '../services/api';
 import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';
-import { Clock, Eye, Tag, ExternalLink } from 'lucide-react';
+import { Clock, Eye, Tag, ExternalLink, Bookmark } from 'lucide-react';
 import { MODE_CONFIG } from '../config/readingModes';
 import type { ReadingMode } from '../config/readingModes';
 import ArticleSummary from "../components/ArticleSummary";
 import TextSettingsPanel from "../components/TextSettingsPanel";
 import type { TextSettings } from '../components/TextSettingsPanel';
 import ShareArticlePanel from "../components/ShareArticlePanel";
+import WordExplainPopup from '../components/WordExplainPopup';
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -25,9 +26,16 @@ const NewsDetailPage: React.FC = () => {
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   const [readingMode, setReadingMode] = useState<ReadingMode>("normal");
   const mode = MODE_CONFIG[readingMode];
+
+  const [selectedWord, setSelectedWord] = useState<string>("");
+  const [meanings, setMeanings] = useState<any[]>([]);
+  const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
+  const [loadingMeaning, setLoadingMeaning] = useState(false);
+
 
   const [isModeOpen, setIsModeOpen] = useState(false);
   const [textSettings, setTextSettings] = useState<TextSettings>({
@@ -36,6 +44,47 @@ const NewsDetailPage: React.FC = () => {
     textColor: '#000000',
     lineHeight: 1.6,
   });
+
+const lookupWord = async (word: string) => {
+  try {
+    setLoadingMeaning(true);
+    setMeanings([]);
+    const url = `/api/dictionary/lookup?word=${word}`;
+
+    const res = await fetch(url);
+
+    if(!res.ok) return;
+
+    const data = await res.json();
+
+    console.log(data)
+
+    if(data.exists) {
+      const result = data.results[0]
+      setMeanings(result.meanings)
+      
+    } else {
+      setMeanings([
+        {
+          pos: "_",
+          definition: "Khong tim thay nghia",
+          source: "Dictionnary"
+        }
+      ])
+    }
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingMeaning(false);
+  }
+};
+
+const closePopup = () => {
+  setSelectedWord("");
+  setMeanings([]);
+  setLoadingMeaning(false);
+};
 
   // Set meta tags cho chia sẻ
   useEffect(() => {
@@ -99,7 +148,37 @@ const NewsDetailPage: React.FC = () => {
     speechSynthesis.cancel();
     setIsSpeaking(false);
     setIsPaused(false);
+    // cập nhật trạng thái saved khi đổi bài
+    const saved = localStorage.getItem('savedArticles');
+    try {
+      const arr = saved ? JSON.parse(saved) : [];
+      setIsSaved(arr.includes(id));
+    } catch {
+      setIsSaved(false);
+    }
   }, [id]);
+
+  const toggleSaveArticle = () => {
+    if (!article) return;
+    const key = 'savedArticles';
+    const raw = localStorage.getItem(key);
+    let arr: string[] = [];
+    try {
+      arr = raw ? JSON.parse(raw) : [];
+    } catch {
+      arr = [];
+    }
+
+    if (arr.includes(article.id.toString())) {
+      arr = arr.filter(x => x !== article.id.toString());
+      setIsSaved(false);
+    } else {
+      arr.push(article.id.toString());
+      setIsSaved(true);
+    }
+
+    localStorage.setItem(key, JSON.stringify(arr));
+  };
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
@@ -114,6 +193,21 @@ const NewsDetailPage: React.FC = () => {
         ]);
         setArticle(newsData);
         setRelatedNews(related);
+        // Thêm vào lịch sử đã xem (localStorage)
+        try {
+          const key = 'viewedArticles';
+          const raw = localStorage.getItem(key);
+          let arr: string[] = raw ? JSON.parse(raw) : [];
+          const idStr = newsData.id.toString();
+          // loại bỏ nếu đã có rồi, đưa lên đầu
+          arr = arr.filter(x => x !== idStr);
+          arr.unshift(idStr);
+          // giữ tối đa 200 mục
+          if (arr.length > 200) arr = arr.slice(0, 200);
+          localStorage.setItem(key, JSON.stringify(arr));
+        } catch (e) {
+          // ignore
+        }
       } catch (err) {
         setError('Không thể tải chi tiết tin tức. Vui lòng thử lại sau.');
         console.error('Error fetching news detail:', err);
@@ -270,6 +364,15 @@ const NewsDetailPage: React.FC = () => {
                     url={`${window.location.origin}/news/${article.id}`}
                     articleId={article.id.toString()}
                   />
+                  <button
+                    onClick={toggleSaveArticle}
+                    className={`px-4 py-2 rounded-lg transition border ${isSaved ? 'bg-yellow-400 text-white' : 'bg-white text-gray-800 hover:bg-gray-50'}`}
+                  >
+                    <div className="flex items-center gap-2">
+                        <Bookmark size={16} strokeWidth={2.5} />
+                        {isSaved ? 'Bỏ lưu bài' : 'Lưu bài'}
+                    </div>
+                  </button>
                 </div>
 
                 {/* Article Summary */}
@@ -277,6 +380,7 @@ const NewsDetailPage: React.FC = () => {
 
                 <div className="flex gap-3 mb-6 mt-3">
                   <button
+                    id="btn-read-news"
                     onClick={handleSpeakToggle}
                     className={`px-4 py-2 rounded-lg text-white transition ${
                       isSpeaking ? "bg-[#3c811e] hover:bg-[#2f6517]" : "bg-[#78b43d] hover:bg-[#3c811e]"
@@ -287,6 +391,7 @@ const NewsDetailPage: React.FC = () => {
 
                   {isSpeaking && (
                     <button
+                      id="btn-pause-news"
                       onClick={handlePauseResume}
                       className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
                     >
@@ -324,9 +429,28 @@ const NewsDetailPage: React.FC = () => {
                                textSettings.fontFamily === 'mono' ? 'Courier New, monospace' :
                                'inherit'
                   }}
+                  onMouseUp={(e) => {
+                    if (selectedWord || loadingMeaning) return;
+                    
+                    const selection = window.getSelection();
+                    const text = selection?.toString().trim();
+
+                    if (text && text.split(" ").length <= 3) {
+                      setSelectedWord(text);
+                      setPopupPos({ x: e.clientX, y: e.clientY });
+                      lookupWord(text);
+                    }
+                  }}
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
-
+                
+                  <WordExplainPopup
+                    word={selectedWord}
+                    meanings={meanings}
+                    loading={loadingMeaning}
+                    position={popupPos}
+                    onClose={closePopup}
+                  />
 
                 {/* Source Link */}
                 {article.sourceUrl && (
@@ -383,6 +507,8 @@ const NewsDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+
     </div>
   );
 };

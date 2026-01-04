@@ -7,14 +7,15 @@ import { getCategoryName } from '../constants';
 interface NewsCardProps {
   article: NewsArticle;
   featured?: boolean;
+  customId?: string;
 }
 
-const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
+const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false, customId }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN', {
       day: '2-digit',
-      month: '2-digit',
+      month: '2-digit', 
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -31,6 +32,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
   if (featured) {
     return (
       <Link
+        id={customId}
         to={`/news/${article.id}`}
         className="block group overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-shadow"
       >
@@ -66,6 +68,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, featured = false }) => {
 
   return (
     <Link
+      id={customId}
       to={`/news/${article.id}`}
       className="block group bg-white rounded-lg shadow hover:shadow-xl transition-shadow overflow-hidden"
     >
