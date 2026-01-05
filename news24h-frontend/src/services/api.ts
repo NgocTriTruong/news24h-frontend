@@ -143,11 +143,29 @@ export const aiApi = {
 
 // ================== COMMENT API ================
 
-export const getComments = (articleId: string) =>
-  api.get(`api/comments?articleId=${articleId}`);
+// export const getComments = (articleId: string) =>
+//   api.get(`api/comments?articleId=${articleId}`);
 
-export const addComment = (data: {
-  articleId: string;
-  content: string;
-}) =>
-  api.post("api/comments", data);
+// export const addComment = (data: {
+//   articleId: string;
+//   content: string;
+// }) =>
+//   api.post("api/comments", data);
+
+// services/api.ts
+
+export const commentApi = {
+  getByArticle: (articleId: string) =>
+    api.get(`/api/comments/${articleId}`),
+
+  add: (articleId: string, content: string) =>
+    api.post(
+      `/api/comments/${articleId}`,
+      content,
+      {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      }
+    ),
+};

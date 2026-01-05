@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getComments, newsApi } from '../services/api';
+import { newsApi } from '../services/api';
 import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';

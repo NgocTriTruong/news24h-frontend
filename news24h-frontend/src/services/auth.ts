@@ -1,4 +1,5 @@
-const BACKEND_URL = "https://api.animalsfeeds.online";
+// const BACKEND_URL = "https://api.animalsfeeds.online";
+const BACKEND_URL = "localhost:8080";
 
 export const authApi = {
   loginGoogle() {
