@@ -48,7 +48,7 @@ const GoldPricePage: React.FC = () => {
   const fetchGoldPrices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/gold-prices');
+      const response = await fetch('https://api.animalsfeeds.online/api/gold-prices');
       if (!response.ok) throw new Error('Không thể tải dữ liệu giá vàng');
       const data = await response.json();
       console.log('Gold prices data:', data); // Debug
@@ -188,7 +188,7 @@ const GoldPricePage: React.FC = () => {
   const handleRefresh = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/gold-prices/refresh', {
+      const response = await fetch('https://api.animalsfeeds.online/api/gold-prices/refresh', {
         method: 'POST',
       });
       if (!response.ok) throw new Error('Không thể cập nhật giá vàng');
@@ -206,7 +206,7 @@ const GoldPricePage: React.FC = () => {
 
   const fetchGoldNews = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/news/category/gia-vang?page=0&size=6');
+      const response = await fetch('https://api.animalsfeeds.online/api/news/category/gia-vang?page=0&size=6');
       if (response.ok) {
         const data = await response.json();
         console.log('Gold news data:', data); // Debug
@@ -720,10 +720,11 @@ const GoldPricePage: React.FC = () => {
                       padding: '12px'
                     }}
                     labelFormatter={(label: string) => `Ngày: ${label}`}
-                    formatter={(value: number, name: string) => [
-                      `${formatPrice(value)}`,
-                      name
-                    ]}
+                    formatter={(value, name) => {
+                      const v = value as number;
+                      const n = name as string;
+                      return [formatPrice(v), n];
+                    }}
                   />
                   <Legend 
                     verticalAlign="bottom"
