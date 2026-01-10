@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import { aiApi } from "../services/api";
 import type { AiChatMessage } from "../types/ai";
+import { MessageCircle } from "lucide-react";
 
 const ChatbotWidget: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -60,14 +61,16 @@ const ChatbotWidget: React.FC = () => {
       {/* Floating button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-full shadow-lg text-white bg-[#78b43d] hover:bg-[#3c811e] transition"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 flex items-center justify-center rounded-full shadow-lg
+                  text-white bg-[#78b43d] hover:bg-[#3c811e] transition"
+        aria-label="Mở chatbot"
       >
-        💬 Chat
+        <MessageCircle size={24} />
       </button>
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-20 right-6 z-50 w-[340px] max-w-[90vw] rounded-2xl shadow-2xl border bg-white overflow-hidden">
+        <div className="fixed bottom-20 z-50 w-[340px] max-w-[90vw] rounded-2xl shadow-2xl border bg-white overflow-hidden" style={{right:82, bottom:27}}>
           <div className="flex items-center justify-between px-4 py-3 bg-[#78b43d] text-white">
             <div className="font-semibold">Trợ lý 24h</div>
             <button onClick={() => setOpen(false)} className="opacity-90 hover:opacity-100">

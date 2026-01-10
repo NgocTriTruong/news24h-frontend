@@ -26,8 +26,8 @@ export const MODE_CONFIG: Record<ReadingMode, ReadingModeConfig> = {
 
     dark: {
       container: "bg-gray-900 text-gray-50",
-      grid: "grid-cols-1",
-      article: "mx-auto max-w-3xl",
+      grid: "grid-cols-1 lg:grid-cols-3",
+      article: "lg:col-span-2",
       prose: "prose-xl prose-invert",
     },
 };

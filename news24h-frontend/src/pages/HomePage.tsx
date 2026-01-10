@@ -4,7 +4,7 @@ import { Flame, TrendingUp, Eye } from 'lucide-react';
 import NewsCard from '../components/NewsCard';
 import Loading from '../components/Loading';
 import { newsApi } from '../services/api';
-import { getCategoryName } from '../constants';
+import { getCategoryName, CATEGORIES } from '../constants';
 import type { NewsArticle } from '../types';
 
 import '../styles/home.css';
@@ -15,6 +15,7 @@ const HomePage: React.FC = () => {
   // const [categoryNews, setCategoryNews] = useState<Record<string, NewsArticle[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categoryNews, setCategoryNews] = useState<Record<string, NewsArticle[]>>({});
 
   const decodeTitle = (title: string) => title.replace(/&#34;/g, '"');
   const formatDate = (dateString: string) =>
@@ -46,6 +47,38 @@ const HomePage: React.FC = () => {
           // Use top headlines as fallback
           setMostViewedNews([]);
         }
+        // Fetch a few items for each top-level category for the bottom section
+        try {
+          const promises = CATEGORIES.map(async (cat) => {
+            // gọi API cho từng subcategory
+            const subPromises = (cat.subcategories || []).map((sub) =>
+              newsApi.getByCategory(sub.slug, 0, 10)
+            );
+
+            const results = await Promise.all(subPromises);
+
+            // gộp tất cả bài từ subcategory
+            const merged: NewsArticle[] = results.flatMap((res: any) => {
+              if (Array.isArray(res)) return res;
+              if (res && Array.isArray(res.content)) return res.content;
+              return [];
+            });
+
+            return { slug: cat.slug, items: merged };
+          });
+
+          const results = await Promise.all(promises);
+
+          const map: Record<string, NewsArticle[]> = {};
+          results.forEach((r) => {
+            map[r.slug] = r.items;
+          });
+
+          setCategoryNews(map);
+        } catch (e) {
+          console.warn('Failed to load category news for bottom section', e);
+        }
+
       } catch (err) {
         setError('Không thể tải tin tức. Vui lòng thử lại sau.');
         console.error('Error fetching news:', err);
@@ -71,11 +104,11 @@ const HomePage: React.FC = () => {
 
   const featuredArticle = topHeadlines[0];
   const other = topHeadlines.slice(1);
-  const spotlightLeft = other.slice(0, 3);
-  const spotlightRight = other.slice(3, 5);
-  const mostRead = other.slice(5, 11);
+  const spotlightLeft = other.slice(0, 5);
+  const spotlightRight = other.slice(5, 10);
+  const mostRead = other.slice(10, 15);
   // Lấy tin mới từ topHeadlines, nếu không đủ thì lấy từ đầu
-  const latestNews = topHeadlines.length > 11 ? other.slice(11, 25) : topHeadlines.slice(0, 14);
+  const latestNews = topHeadlines.length > 11 ? other.slice(15, 19) : topHeadlines.slice(0, 14);
 
   const renderCompactCard = (article: NewsArticle) => (
     <Link
@@ -187,53 +220,11 @@ const HomePage: React.FC = () => {
       )}
 
       <div className="container mx-auto px-4 py-8 space-y-10">
-        <div className="flex items-center gap-4 border-b border-gray-200 pb-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#78b43d] to-[#3c811e] flex items-center justify-center text-white font-bold">
-            24h
-          </div>
-          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Giải Trí</h1>
-          <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-            <span className="px-3 py-1 rounded-full bg-white shadow-sm">Đời sống Showbiz</span>
-            <span className="px-3 py-1 rounded-full bg-white shadow-sm">Âm nhạc</span>
-            <span className="px-3 py-1 rounded-full bg-white shadow-sm">Phim ảnh</span>
-            <span className="px-3 py-1 rounded-full bg-white shadow-sm">TV Show</span>
-            <span className="px-3 py-1 rounded-full bg-white shadow-sm">Đàn ông</span>
-          </div>
-        </div>
 
         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)_280px]">
           <div className="space-y-3">
             <div className="section-title">Tin chọn lọc</div>
-            {spotlightLeft.map((article) => (
-              <Link
-                key={article.id}
-                to={`/news/${article.id}`}
-                className="group bg-white rounded-lg shadow-sm hover:shadow-md transition overflow-hidden"
-              >
-                <div className="grid grid-cols-[120px_1fr] gap-3">
-                  <div className="relative h-full min-h-[110px] overflow-hidden">
-                    <img
-                      src={`${article.thumbnail}?cache=${article.id}`}
-                      alt={decodeTitle(article.title)}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/240x180?text=No+Image';
-                      }}
-                    />
-                  </div>
-                  <div className="p-3">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                      <span className="text-[#3c811e] font-semibold">{getCategoryName(article.category)}</span>
-                      <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                      <span>{formatDate(article.publishedAt)}</span>
-                    </div>
-                    <h3 className="text-sm font-bold text-gray-900 leading-snug line-clamp-2 group-hover:text-[#78b43d] transition">
-                      {decodeTitle(article.title)}
-                    </h3>
-                  </div>
-                </div>
-              </Link>
-            ))}
+            {spotlightLeft.map((article) => renderCompactCard(article))}
           </div>
 
           <div className="space-y-4">
@@ -272,7 +263,7 @@ const HomePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="section-title">Đang chú ý</div>
             <div className="space-y-3">
               {spotlightRight.map((article) => renderCompactCard(article))}
@@ -280,7 +271,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]" style={{marginTop: 10}}>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="section-title mb-4">Tin mới cập nhật</div>
             <div className="space-y-4">
@@ -291,9 +282,37 @@ const HomePage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="section-title">Tin giải trí</div>
               <div className="space-y-3">
-                {mostRead.slice(0, 4).map((article) => renderCompactCard(article))}
+                {mostRead.slice(0, 5).map((article) => renderCompactCard(article))}
               </div>
             </div>
+          </div>
+        </div>
+        
+        {/* Bottom: Other categories in 2 columns */}
+        <div className="container mx-auto px-4 py-8" style={{marginTop: -10}}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {Object.keys(categoryNews).map((slug) => {
+              const items = (categoryNews[slug] || []).filter(a => a.id !== featuredArticle?.id).slice(0, 5);
+              if (!items || items.length === 0) return null;
+              return (
+                <div key={slug}>
+                  <h3 className="text-lg font-bold text-[#78b43d] mb-3">{getCategoryName(slug)}</h3>
+                  <div className="mb-3">
+                    <NewsCard article={items[0]} />
+                  </div>
+                  <ul>
+                    {items.slice(1).map((a) => (
+                      <li key={a.id} className="py-2 border-b border-gray-200">
+                        <a href={`/news/${a.id}`} className="block text-sm font-semibold text-gray-900 hover:text-[#78b43d] mb-1">
+                          {a.title.replace(/&#34;/g, '"')}
+                        </a>
+                        <p className="text-xs text-gray-600 line-clamp-2">{a.description}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
