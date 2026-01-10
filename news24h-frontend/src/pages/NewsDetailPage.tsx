@@ -4,7 +4,7 @@ import { newsApi } from '../services/api';
 import type { NewsArticle } from '../types';
 import Loading from '../components/Loading';
 import { getCategoryName } from '../constants';
-import { Clock, Eye, Tag, ExternalLink, Bookmark } from 'lucide-react';
+import { Clock, Eye, Tag, ExternalLink, Bookmark, Volume2, Play, Pause, Moon, X, Target } from 'lucide-react';
 import { MODE_CONFIG } from '../config/readingModes';
 import type { ReadingMode } from '../config/readingModes';
 import ArticleSummary from "../components/ArticleSummary";
@@ -12,6 +12,7 @@ import TextSettingsPanel from "../components/TextSettingsPanel";
 import type { TextSettings } from '../components/TextSettingsPanel';
 import ShareArticlePanel from "../components/ShareArticlePanel";
 import WordExplainPopup from '../components/WordExplainPopup';
+import { useAuth } from '../context/AuthContext';
 
 // const stopSpeak = () => {
 //   speechSynthesis.cancel();
@@ -35,6 +36,11 @@ const NewsDetailPage: React.FC = () => {
   const [meanings, setMeanings] = useState<any[]>([]);
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
   const [loadingMeaning, setLoadingMeaning] = useState(false);
+
+  // Comments
+  const [comments, setComments] = useState<Array<{id: string; author: string; authorId?: string; text: string; createdAt: string;}>>([]);
+  const [newComment, setNewComment] = useState('');
+  const { user, isAuthenticated } = useAuth();
 
 
   const [isModeOpen, setIsModeOpen] = useState(false);
@@ -218,6 +224,14 @@ const closePopup = () => {
 
     fetchNewsDetail();
     window.scrollTo(0, 0);
+    // load comments for this article from localStorage
+    try {
+      const raw = localStorage.getItem(`comments_${id}`);
+      const arr = raw ? JSON.parse(raw) : [];
+      setComments(Array.isArray(arr) ? arr : []);
+    } catch (e) {
+      setComments([]);
+    }
   }, [id]);
 
   if (loading) return <Loading />;
@@ -343,7 +357,15 @@ const closePopup = () => {
                         : "bg-gray-800 text-white hover:bg-black"
                     }`}
                   >
-                    {readingMode === "focus" ? "❌ Thoát Focus" : "🧘 Focus"}
+                    {readingMode === "focus" ? (
+                      <>
+                        <X size={16} className="inline-block mr-2" /> Thoát Focus
+                      </>
+                    ) : (
+                      <>
+                        <Target size={16} className="inline-block mr-2" /> Focus
+                      </>
+                    )}
                   </button>
 
                   {/* Dark toggle */}
@@ -355,7 +377,15 @@ const closePopup = () => {
                         : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     }`}
                   >
-                    {readingMode === "dark" ? "🌙 Tắt Dark" : "🌙 Dark"}
+                    {readingMode === "dark" ? (
+                      <>
+                        <Moon size={16} className="inline-block mr-2" /> Tắt Dark
+                      </>
+                    ) : (
+                      <>
+                        <Moon size={16} className="inline-block mr-2" /> Dark
+                      </>
+                    )}
                   </button>
 
                   {/* Share Button */}
@@ -386,16 +416,32 @@ const closePopup = () => {
                       isSpeaking ? "bg-[#3c811e] hover:bg-[#2f6517]" : "bg-[#78b43d] hover:bg-[#3c811e]"
                     }`}
                   >
-                    {isSpeaking ? "🔊 Đang nghe..." : "🔊 Nghe tin"}
+                    {isSpeaking ? (
+                      <>
+                        <Volume2 size={16} className="inline-block mr-2" /> Đang nghe...
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 size={16} className="inline-block mr-2" /> Nghe tin
+                      </>
+                    )}
                   </button>
 
                   {isSpeaking && (
                     <button
                       id="btn-pause-news"
                       onClick={handlePauseResume}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition flex items-center gap-2"
                     >
-                      {isPaused ? "▶ Tiếp tục" : "⏸ Tạm dừng"}
+                      {isPaused ? (
+                        <>
+                          <Play size={14} /> Tiếp tục
+                        </>
+                      ) : (
+                        <>
+                          <Pause size={14} /> Tạm dừng
+                        </>
+                      )}
                     </button>
                   )}
                 </div>
@@ -453,7 +499,7 @@ const closePopup = () => {
                   />
 
                 {/* Source Link */}
-                {article.sourceUrl && (
+                {/* {article.sourceUrl && (
                   <div className="mt-8 pt-6 border-t">
                     <Link
                       to="/category/gia-vang"
@@ -463,7 +509,69 @@ const closePopup = () => {
                       Xem các tin tức khác về vàng
                     </Link>
                   </div>
-                )}
+                )} */}
+
+                {/* Comments Section */}
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="text-lg font-semibold mb-3">Bình luận</h3>
+
+                  {/* New comment box */}
+                  {isAuthenticated ? (
+                    <div className="mb-4">
+                      <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        rows={3}
+                        className="w-full p-3 border rounded resize-none"
+                        placeholder="Viết bình luận của bạn..."
+                      />
+                      <div className="flex items-center justify-end mt-2">
+                        <button
+                          onClick={async () => {
+                            if (!newComment.trim()) return;
+                            const comment = {
+                              id: Date.now().toString(),
+                              author: user?.name || 'Người dùng',
+                              authorId: undefined,
+                              text: newComment.trim(),
+                              createdAt: new Date().toISOString(),
+                            };
+                            const updated = [comment, ...comments];
+                            setComments(updated);
+                            setNewComment('');
+                            try {
+                              localStorage.setItem(`comments_${id}`, JSON.stringify(updated));
+                            } catch (e) {
+                              console.error('Failed to save comment', e);
+                            }
+                          }}
+                          className="px-4 py-2 bg-[#78b43d] text-white rounded"
+                        >
+                          Gửi bình luận
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-4 text-gray-600">Cần đăng nhập để bình luận.</div>
+                  )}
+
+                  {/* Existing comments */}
+                  <div className="space-y-4">
+                    {comments.length === 0 ? (
+                      <div className="text-gray-500">Chưa có bình luận nào. Hãy là người bình luận đầu tiên.</div>
+                    ) : (
+                      comments.map((c) => (
+                        <div key={c.id} className="border rounded p-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="font-semibold text-sm">{c.author}</div>
+                            <div className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleString('vi-VN')}</div>
+                          </div>
+                          <div className="text-gray-800 text-sm">{c.text}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
             </article>
           </div>
