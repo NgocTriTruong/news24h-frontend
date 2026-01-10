@@ -77,7 +77,7 @@ export const CATEGORIES: Category[] = [
       { slug: 'dien-thoai', name: 'Điện thoại' },
       { slug: 'laptop-gia-re', name: 'Laptop' },
       { slug: 'tin-tuc-cong-nghe', name: 'Tin tức công nghệ' },
-            { slug: 'may-tinh-de-ban', name: 'Máy tính để bàn' },
+      { slug: 'may-tinh-de-ban', name: 'Máy tính để bàn' },
       { slug: 'may-tinh-bang', name: 'Máy tính bảng' },
       { slug: 'cac-san-pham-khac', name: 'Phụ kiện hi-tech' },
 
@@ -90,6 +90,7 @@ export const CATEGORIES: Category[] = [
       { slug: 'an-ninh-hinh-su', name: 'An ninh hình sự' },
       { slug: 'diem-nong', name: 'Điểm nóng' },
       { slug: 'quan-su', name: 'Quân sự' },
+      { slug: 'theo-dong-lich-su', name: 'Theo dòng lịch sử' },
     ]
   },
     { 
