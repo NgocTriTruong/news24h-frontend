@@ -146,7 +146,7 @@ const WordDefinitionPopup: React.FC = () => {
             </>
           ) : (
             <div className="text-sm text-gray-600 text-center py-4">
-              <p>❌ {definition.message}</p>
+              <p><X size={14} className="inline-block mr-2 text-red-500" />{definition.message}</p>
               <p className="text-xs text-gray-400 mt-2">Thử từ khác hoặc kiểm tra chính tả</p>
             </div>
           )}
