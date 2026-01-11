@@ -50,20 +50,24 @@ const CategoryPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 py-8">
         {/* Category Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 pb-3 border-b-4 border-[#78b43d] inline-block">
-            {slug ? getCategoryName(slug) : 'Danh mục'}
-          </h1>
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-1 h-8 bg-[#78b43d] rounded-full"></div>
+            <h1 className="text-4xl font-bold text-gray-900">
+              {slug ? getCategoryName(slug) : 'Danh mục'}
+            </h1>
+          </div>
+          <p className="text-gray-600 ml-4">Cập nhật tin tức mới nhất từ danh mục này</p>
         </div>
 
         {/* Articles Grid */}
         {articles.length > 0 ? (
           <>
             {/* Featured + Side Articles */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
               {/* Featured Article - Left Side (spans 1 column) */}
               {articles.length > 0 && (
                 <div className="lg:col-span-1">
@@ -80,48 +84,30 @@ const CategoryPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {articles.map((article, index) => (
-                <div key={article.id} className="relative group">
-                  {/* Thẻ div này dùng để AI định vị.
-                    Khi AI gọi lệnh click(), ta cần navigate. 
-                    Do NewsCard bên trong đã có Link, ta có thể tìm thẻ <a> bên trong div này để click
-                  */}
-                  <div className="news-item-trigger hidden" onClick={() => {
-                      // Tìm link bên trong và click
+
+            {/* Main Grid */}
+            <div className="mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {articles.slice(5).map((article, index) => (
+                  <div key={article.id} className="relative group">
+                    <div className="news-item-trigger hidden" onClick={() => {
                       const link = document.getElementById(`news-link-${article.id}`);
                       link?.click();
-                  }}></div>
-
-                  {/* Hiển thị số thứ tự để người dùng dễ đọc */}
-                  <span className="absolute top-0 left-0 bg-[#78b43d] text-white text-xs font-bold px-2 py-1 z-10 rounded-tl-lg">
-                    #{index + 1}
-                  </span>
+                    }}></div>
                   
-                  {/* Truyền id cho NewsCard để tạo id cho thẻ Link */}
-                  <NewsCard article={article} customId={`news-link-${article.id}`} />
-                </div>
-              ))}
-            </div>
-
-            {/* Related Articles Below */}
-            {articles.length > 5 && (
-              <div className="mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {articles.slice(5).map((article) => (
-                    <NewsCard key={article.id} article={article} />
-                  ))}
-                </div>
+                    <NewsCard article={article} customId={`news-link-${article.id}`} />
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2 py-8 border-t border-gray-200">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                   disabled={currentPage === 0}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-[#78b43d] hover:text-white hover:border-[#78b43d] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                   <ChevronLeft size={20} />
                   Trước
@@ -144,10 +130,10 @@ const CategoryPage: React.FC = () => {
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-10 h-10 rounded-lg ${
+                        className={`w-10 h-10 rounded-lg font-semibold transition-all ${
                           currentPage === pageNum
-                            ? 'bg-[#78b43d] text-white font-bold'
-                            : 'bg-white border border-gray-300 hover:bg-[#78b43d]/10'
+                            ? 'bg-gradient-to-br from-[#78b43d] to-green-700 text-white shadow-lg scale-105'
+                            : 'bg-white border border-gray-300 hover:border-[#78b43d] hover:text-[#78b43d]'
                         }`}
                       >
                         {pageNum + 1}
@@ -159,7 +145,7 @@ const CategoryPage: React.FC = () => {
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
                   disabled={currentPage === totalPages - 1}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-[#78b43d] hover:text-white hover:border-[#78b43d] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                   Sau
                   <ChevronRight size={20} />
@@ -168,8 +154,14 @@ const CategoryPage: React.FC = () => {
             )}
           </>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Không có tin tức nào trong danh mục này.</p>
+          <div className="text-center py-20">
+            <div className="inline-block">
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl">📰</span>
+              </div>
+              <p className="text-gray-600 text-lg font-medium">Không có tin tức nào</p>
+              <p className="text-gray-500 text-sm">Danh mục này chưa có tin tức, vui lòng quay lại sau</p>
+            </div>
           </div>
         )}
       </div>

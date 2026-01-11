@@ -154,7 +154,7 @@ const replaceTeamLogo = (teamName: string, oldLogo: string): string => {
 export const footballApi = {
   // Lấy bảng xếp hạng theo giải đấu
   getStandings: async (leagueId: string): Promise<FootballTeam[]> => {
-    const response = await fetch(`${FOOTBALL_API_BASE_URL}/${leagueId}/standings`);
+    const response = await fetch(`${FOOTBALL_API_BASE_URL}/standings`);
     if (!response.ok) throw new Error('Failed to fetch standings');
     const data: FootballTeamResponse[] = await response.json();
     
