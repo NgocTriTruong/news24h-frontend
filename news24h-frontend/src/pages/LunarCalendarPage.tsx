@@ -532,9 +532,6 @@ const LunarCalendarPage = () => {
                               }}
                             />
                           )}
-                          <div className="absolute -top-2 -left-2 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-md">
-                            {index + 1}
-                          </div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors">
