@@ -54,7 +54,7 @@ const FootballResultsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:8080/api/football/${selectedLeague}/matches`);
+      const response = await fetch(`https://api.animalsfeeds.online/api/football/${selectedLeague}/matches`);
       if (!response.ok) throw new Error('Failed to fetch matches');
       
       const allMatches: Match[] = await response.json();

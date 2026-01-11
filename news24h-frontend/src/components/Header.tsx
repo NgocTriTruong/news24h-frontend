@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 // import { Search, Menu, X, Home, ChevronDown, User, TrendingUp, Trophy, Calendar, DollarSign } from 'lucide-react';
 import LoginPage from '../pages/LoginPage';
-import { Search, Menu, X, Home, ChevronDown, User, Trophy, Calendar, DollarSign, Bookmark, List, Link as LinkIcon, LogOut } from 'lucide-react';
+import { Search, Menu, X, Home, ChevronDown, User, Trophy, Calendar, DollarSign, Bookmark, List, Link as LinkIcon, LogOut, Mic } from 'lucide-react';
+import vangImg from '../assets/vang.jpg';
+import bongDaImg from '../assets/bong-da.jpeg';
+import lichImg from '../assets/lich.png';
 import { CATEGORIES } from '../constants';
 import { useAuth } from "../context/AuthContext";
 
@@ -41,7 +44,6 @@ const Header: React.FC = () => {
     };
 
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
 
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -49,34 +51,42 @@ const Header: React.FC = () => {
 
     if (!SpeechRecognition) {
       console.warn("Trình duyệt không hỗ trợ Speech Recognition");
-      return;
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "vi-VN";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        const cleanedTranscript = transcript.trim().replace(/[.,!?]+$/g, '');
+
+        setSearchQuery(cleanedTranscript);
+        navigate(`/search?q=${encodeURIComponent(cleanedTranscript)}`);
+        setIsListening(false);
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "vi-VN";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-
-      // Xóa dấu chấm, dấu hỏi, dấu phẩy ở cuối
-    const cleanedTranscript = transcript.trim().replace(/[.,!?]+$/g, '');
-
-      setSearchQuery(cleanedTranscript);
-      navigate(`/search?q=${encodeURIComponent(cleanedTranscript)}`);
-      setIsListening(false);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // ignore
+        }
+      }
     };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
   }, [navigate]);
 
   const handleVoiceSearch = () => {
@@ -99,8 +109,8 @@ const Header: React.FC = () => {
     }
   };
 
-  const visibleCategories = CATEGORIES.slice(0, 9);
-  const hiddenCategories = CATEGORIES.slice(9);
+  const visibleCategories = CATEGORIES.slice(0, 10);
+  const hiddenCategories = CATEGORIES.slice(10);
 
   return (
     <>
@@ -122,7 +132,7 @@ const Header: React.FC = () => {
           
           {/* LOGO - TO HƠN */}
           <Link to="/" className="shrink-0">
-            <div className="bg-white px-5 py-3 rounded-lg transition-all duration-300">
+            <div className="bg-white px-5 py-1 rounded-lg transition-all duration-300">
                <img 
                 alt="Tin tức 24h" 
                 src="https://cdn.24h.com.vn/images/2023/logo-24h-new.svg" 
@@ -131,34 +141,20 @@ const Header: React.FC = () => {
             </div>
           </Link>
 
-          {/* CÁC MỤC ĐẶC BIỆT - TO VÀ ĐẸP HƠN */}
-          <div className="hidden lg:flex items-center gap-3">
-            {/* Giá vàng */}
-            <Link 
-              to="/gia-vang"
-              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
-            >
-              <DollarSign size={18} className="group-hover:rotate-12 transition-transform" />
+          {/* CÁC MỤC ĐẶC BIỆT - LOGOS (sitting flush on green nav) */}
+          <div className="hidden lg:flex items-center gap-3 mt-6 lg:-mt-8" style={{marginLeft: 100}}>
+            <Link to="/gia-vang" title="Giá vàng" className="ms-12 mt-5 pt-3 flex items-center px-2 py-0 hover:opacity-90 transition-opacity">
+              <img src={vangImg} alt="Giá vàng" className="h-6 w-auto object-contain me-2" />
               <span>Giá vàng</span>
             </Link>
 
-            {/* Cup C1 */}
-            <Link 
-              to="/cup-c1"
-              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
-            >
-              <Trophy size={18} className="group-hover:rotate-12 transition-transform" />
+            <Link to="/cup-c1" title="Cup C1" className=" ms-4 me-4 mt-5 pt-3 flex items-center px-2 py-0 hover:opacity-90 transition-opacity">
+              <img src={bongDaImg} alt="Cup C1" className="h-6 w-auto object-contain me-2" />
               <span>Cup C1</span>
             </Link>
 
-
-
-            {/* Lịch Vạn Niên */}
-            <Link 
-              to="/lich-van-nien"
-              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 font-bold text-sm shadow-md hover:shadow-xl hover:scale-105"
-            >
-              <Calendar size={18} className="group-hover:rotate-12 transition-transform" />
+            <Link to="/lich-van-nien" title="Lịch" className=" mt-5 pt-3 flex items-center px-2 py-0 hover:opacity-90 transition-opacity">
+              <img src={lichImg} alt="Lịch" className="h-6 w-auto object-contain me-2" />
               <span>Lịch</span>
             </Link>
           </div>
@@ -166,13 +162,13 @@ const Header: React.FC = () => {
           {/* CỤM SEARCH & USER */}
           <div className="flex items-center gap-5 w-full lg:w-auto">
             {/* Search Form - LỚN VÀ ĐẸP HƠN */}
-            <form onSubmit={handleSearch} className="relative w-full md:w-96 group">
+            <form onSubmit={handleSearch} className="relative w-full md:w-96 group border border-gray rounded-full px-2">
               <input
                 type="text"
                 placeholder="Tìm kiếm tin tức..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-12 pl-5 pr-12 text-base text-gray-800 bg-white border-2 border-white/20 rounded-full outline-none focus:border-white focus:ring-2 focus:ring-white/30 transition-all shadow-lg"
+                className="w-full h-12 pl-5 pr-12 text-base text-gray-800 bg-transparent rounded-full outline-none focus:border-white transition-all"
               />
                {/* Voice Search Button */}
               <button
@@ -182,14 +178,15 @@ const Header: React.FC = () => {
                   isListening ? "bg-green-600 animate-pulse text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
                 title="Tìm kiếm bằng giọng nói"
+                style={{marginRight: 5}}
               >
-                🎤
+                <Mic size={16} />
               </button>
 
               {/* Search Button */}
               <button
                 type="submit"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#78b43d] text-white rounded-full flex items-center justify-center hover:bg-[#3c811e] hover:scale-110 transition-all shadow-md"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-white text-gray-800 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-100 transition-all"
               >
                 <Search size={18} />
               </button>
@@ -281,7 +278,7 @@ const Header: React.FC = () => {
       {/* Hàng 2: MENU NGANG */}
       <nav className="bg-[#78b43d] text-white sticky top-0 z-50 border-t border-green-800/30">
         <div className="max-w-7xl mx-auto">
-          <ul className="hidden md:flex items-center text-sm font-bold uppercase tracking-wide">
+          <ul className="hidden md:flex items-center text-sm font-bold uppercase tracking-wide" style={{marginLeft: 50}}>
             {/* Icon Menu 3 gạch */}
             <li>
               <button
@@ -476,7 +473,7 @@ const Header: React.FC = () => {
                   placeholder="Tìm kiếm..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-4 pr-10 py-2 rounded-full text-gray-800 text-sm focus:ring-2 focus:ring-green-400 outline-none"
+                  className="w-full pl-4 pr-10 py-2 rounded-full text-gray-800 text-sm outline-none focus:ring-2 focus:ring-green-400"
                 />
 
                 <button
@@ -486,10 +483,10 @@ const Header: React.FC = () => {
                     isListening ? "bg-white text-green-600 animate-pulse" : "bg-green-500 text-white"
                   }`}
                 >
-                  🎤
+                  <Mic size={16} />
                 </button>
 
-                <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center hover:bg-green-400">
+                <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-white text-gray-800 border border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-100">
                   <Search size={16} />
                 </button>
               </form>

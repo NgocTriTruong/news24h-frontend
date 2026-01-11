@@ -12,7 +12,7 @@ export interface DefinitionResponse {
 // Gọi backend API để lấy định nghĩa từ Gemini
 export const getWordDefinition = async (word: string): Promise<DefinitionResponse> => {
   try {
-    const backendUrl = 'http://localhost:8080';
+    const backendUrl = 'https://api.animalsfeeds.online';
     const response = await fetch(`${backendUrl}/api/definitions/lookup`, {
       method: 'POST',
       headers: {
