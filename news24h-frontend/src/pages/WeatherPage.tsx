@@ -248,17 +248,47 @@ const WeatherPage: React.FC = () => {
       <div className="container mx-auto px-4 py-6">
         {/* Air Quality Index */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <h2 className="text-lg font-bold text-gray-900">Chỉ số không khí</h2>
+          {/* Ribbon header */}
+          <div className="mb-2">
+            <div className="flex items-center">
+              <div className="relative inline-flex items-center">
+                <span className="bg-green-500 text-white font-bold px-4 py-2 rounded-md shadow-sm">Chỉ số không khí</span>
+                <span className="h-6 w-4 bg-green-500 -ml-1 transform skew-x-[-20deg] rounded-r"></span>
+              </div>
+              <div className="flex-1 ml-4 border-b-2 border-green-300"></div>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-start justify-between gap-6">
+            {/* AQI Tiles */}
             <div className="flex flex-wrap gap-4">
               {airQualityData.map((item) => (
-                <div key={item.city} className="flex items-center gap-2">
-                  <span className="font-medium text-gray-700">{item.city}</span>
-                  <span className={`px-3 py-1 rounded-full font-bold ${getAirQualityColor(item.value)}`}>
+                <div
+                  key={item.city}
+                  className="px-4 py-3 rounded-xl border border-green-300 shadow-sm hover:shadow-md transition hover:-translate-y-0.5 bg-white"
+                >
+                  <div className="text-gray-800 font-semibold text-sm text-center">{item.city}</div>
+                  <div className={`mt-2 px-4 py-1.5 rounded-md font-bold text-center ${getAirQualityColor(item.value)} ring-1 ring-current/20`}> 
                     {item.value}
-                  </span>
+                  </div>
                 </div>
               ))}
+            </div>
+
+            {/* Legend */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-sm bg-green-500 border border-green-600"></span>
+                <span className="text-gray-700 text-sm">Tốt</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-sm bg-orange-400 border border-orange-500"></span>
+                <span className="text-gray-700 text-sm">Xấu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-sm bg-red-500 border border-red-600"></span>
+                <span className="text-gray-700 text-sm">Kém</span>
+              </div>
             </div>
           </div>
         </div>
@@ -384,42 +414,42 @@ const WeatherPage: React.FC = () => {
         </div>
 
         {/* Weather News Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-red-600 inline-block">
+        <div className="bg-white rounded-lg shadow-md p-4">
+          <h2 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b-2 border-red-600 inline-block">
             DỰ BÁO THỜI TIẾT
           </h2>
-          <div className="space-y-4 mt-6">
+          <div className="space-y-3 mt-4">
             <Link to="/" className="block group">
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <img 
                   src="https://cdn.24h.com.vn/upload/1-2025/images/2025-01-11/1736544373-607-thumbnail-width620height413.jpg"
                   alt="Weather news"
-                  className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
+                  className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
                 />
                 <div>
-                  <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                  <h3 className="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
                     Thời tiết hôm nay 11/1: Miền Bắc rét đậm, vùng núi đề phòng băng giá
                   </h3>
-                  <p className="text-sm text-gray-600">
-                    Ngày 11/1, thời tiết trên cả nước phổ biến ít mưa, ban ngày có nắng, song rét tiếp tục bao trùm nhiều khu vực. Miền Bắc và Bắc Trung Bộ duy trì nền nhiệt thấp...
+                  <p className="text-xs text-gray-600 line-clamp-2">
+                    Ngày 11/1, thời tiết trên cả nước phổ biến ít mưa, ban ngày có nắng, song rét tiếp tục bao trùm nhiều khu vực...
                   </p>
                 </div>
               </div>
             </Link>
 
             <Link to="/" className="block group">
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <img 
                   src="https://cdn.24h.com.vn/upload/1-2025/images/2025-01-10/1736544373-607-thumbnail-width620height413.jpg"
                   alt="Weather news"
-                  className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
+                  className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
                 />
                 <div>
-                  <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                  <h3 className="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
                     Hình thái thời tiết rét đậm vào đêm và nắng vào ban ngày ở miền Bắc kéo dài đến khi nào?
                   </h3>
-                  <p className="text-sm text-gray-600">
-                    Trong một tuần tới, miền Bắc sẽ tiếp tục duy trì hình thái thời tiết không mưa, ngày nắng, nền nhiệt rất thấp về đêm và sáng sớm...
+                  <p className="text-xs text-gray-600 line-clamp-2">
+                    Trong một tuần tới, miền Bắc sẽ tiếp tục duy trì hình thái thời tiết không mưa, ngày nắng...
                   </p>
                 </div>
               </div>
