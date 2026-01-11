@@ -27,7 +27,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Erling Haaland',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/418560-1694609670.jpg?lm=1',
         team: 'Manchester City',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/z44I3trAKIRoybNGjIm5lA_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg',
         league: 'Premier League',
         goals: 21,
         matches: 17,
@@ -40,7 +40,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Harry Kane',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/132098-1664804505.jpg?lm=1',
         team: 'Bayern Munich',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/I5o7CR636EeUtn3yhnQEjg_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/1024px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png',
         league: 'Bundesliga',
         goals: 20,
         matches: 15,
@@ -53,7 +53,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Kylian Mbappe',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/342229-1682683695.jpg?lm=1',
         team: 'Real Madrid',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/Th4fAVAZeCJWRcKoLW7koA_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
         league: 'La Liga',
         goals: 18,
         matches: 16,
@@ -66,7 +66,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Mohamed Salah',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/148455-1667830921.jpg?lm=1',
         team: 'Liverpool',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/0iShcZRd6kN6m3Z82W7TTQ_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg',
         league: 'Premier League',
         goals: 17,
         matches: 17,
@@ -79,7 +79,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Robert Lewandowski',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/38253-1635245402.jpg?lm=1',
         team: 'Barcelona',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/paYnEE8hcrP96neHRNofhQ_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%282009%E2%80%93present%29.svg',
         league: 'La Liga',
         goals: 16,
         matches: 16,
@@ -92,7 +92,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Victor Osimhen',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/401923-1667830889.jpg?lm=1',
         team: 'Napoli',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/dlkcWV2YneHaMtHjC2DcKw_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/2/2d/SSC_Napoli.svg',
         league: 'Serie A',
         goals: 15,
         matches: 14,
@@ -105,7 +105,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Cole Palmer',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/568874-1694609839.jpg?lm=1',
         team: 'Chelsea',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/fhBITrIlbQxhVB6IjxUO6Q_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg',
         league: 'Premier League',
         goals: 15,
         matches: 17,
@@ -118,7 +118,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Lautaro Martinez',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/406625-1655802408.jpg?lm=1',
         team: 'Inter Milan',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/l8C5GF5wqv9NOKcu1KBGMw_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/0/05/FC_Internazionale_Milano_2021.svg',
         league: 'Serie A',
         goals: 14,
         matches: 15,
@@ -131,7 +131,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Alexander Isak',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/393720-1667383468.jpg?lm=1',
         team: 'Newcastle',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/96CcNNQ0AYDAbssP0V9LuQ_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Newcastle_United_FC_2021.svg',
         league: 'Premier League',
         goals: 14,
         matches: 16,
@@ -144,7 +144,7 @@ const TopScorersPage: React.FC = () => {
         name: 'Jude Bellingham',
         photo: 'https://img.a.transfermarkt.technology/portrait/big/581678-1683645018.jpg?lm=1',
         team: 'Real Madrid',
-        teamLogo: 'https://ssl.gstatic.com/onebox/media/sports/logos/Th4fAVAZeCJWRcKoLW7koA_48x48.png',
+        teamLogo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
         league: 'La Liga',
         goals: 13,
         matches: 16,
@@ -264,6 +264,9 @@ const TopScorersPage: React.FC = () => {
                             src={player.teamLogo}
                             alt={player.team}
                             className="w-4 h-4 object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
                           />
                           <span>{player.team}</span>
                           <span className="text-gray-400">•</span>
