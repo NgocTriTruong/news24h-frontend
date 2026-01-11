@@ -18,6 +18,7 @@ interface TeamStanding {
 
 const CupC1Page: React.FC = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [premierLeagueArticles, setPremierLeagueArticles] = useState<NewsArticle[]>([]);
   const [standings, setStandings] = useState<TeamStanding[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,14 +50,16 @@ const CupC1Page: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Lấy tin tức và bảng xếp hạng song song
-        const [newsResponse, standingsData] = await Promise.all([
+        // Lấy tin tức Cup C1, Ngoại hạng Anh và bảng xếp hạng song song
+        const [newsResponse, premierLeagueResponse, standingsData] = await Promise.all([
           newsApi.getByCategory('cup-c1', 0, 8),
+          newsApi.getByCategory('ngoai-hang-anh', 0, 6),
           footballApi.getStandings('cup-c1')
         ]);
         
         console.log('Cup C1 Articles:', newsResponse.content.map(a => ({ id: a.id, title: a.title.substring(0, 30), thumbnail: a.thumbnail })));
         setArticles(newsResponse.content);
+        setPremierLeagueArticles(premierLeagueResponse.content);
         
         // Map dữ liệu standings từ API về format cũ
         const mappedStandings = standingsData.slice(0, 5).map(team => ({
@@ -292,55 +295,103 @@ const CupC1Page: React.FC = () => {
           </div>
         </div>
 
-        {/* Tin Mới Nhất */}
-        <div className="bg-white">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-red-600 inline-block">
-            TIN MỚI NHẤT
-          </h2>
-          
-          {error && (
-            <div className="p-6">
-              <p className="text-red-600">{error}</p>
-            </div>
-          )}
+        {/* Tin Mới Nhất - 2 Columns */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Cột Trái - Tin Mới Nhất Cup C1 */}
+          <div className="bg-white">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-red-600 inline-block">
+              TIN MỚI NHẤT
+            </h2>
+            
+            {error && (
+              <div className="p-6">
+                <p className="text-red-600">{error}</p>
+              </div>
+            )}
 
-          {articles.length > 0 ? (
-            <div className="space-y-6">
-              {articles.map((article) => (
-                <Link 
-                  key={article.id} 
-                  to={`/news/${article.id}`}
-                  className="flex gap-4 group"
-                >
-                  {article.thumbnail && (
-                    <img 
-                      src={`${article.thumbnail}?t=${Date.now()}`} 
-                      alt={article.title}
-                      className="w-40 h-28 object-cover rounded-lg flex-shrink-0 group-hover:opacity-90 transition-opacity"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/160x112?text=No+Image';
-                      }}
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
-                      {article.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">
-                      {article.description}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="p-12 text-center">
-              <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">
-                Chưa có tin tức mới. Vui lòng quay lại sau!
-              </p>
-            </div>
-          )}
+            {articles.length > 0 ? (
+              <div className="space-y-6">
+                {articles.map((article) => (
+                  <Link 
+                    key={article.id} 
+                    to={`/news/${article.id}`}
+                    className="flex gap-4 group"
+                  >
+                    {article.thumbnail && (
+                      <img 
+                        src={`${article.thumbnail}?t=${Date.now()}`} 
+                        alt={article.title}
+                        className="w-40 h-28 object-cover rounded-lg flex-shrink-0 group-hover:opacity-90 transition-opacity"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/160x112?text=No+Image';
+                        }}
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {article.description}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="p-12 text-center">
+                <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">
+                  Chưa có tin tức mới. Vui lòng quay lại sau!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Cột Phải - Tin Ngoại Hạng Anh */}
+          <div className="bg-white">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-blue-600 inline-block">
+              NGOẠI HẠNG ANH
+            </h2>
+            
+            {premierLeagueArticles.length > 0 ? (
+              <div className="space-y-6">
+                {premierLeagueArticles.map((article) => (
+                  <Link 
+                    key={article.id} 
+                    to={`/news/${article.id}`}
+                    className="flex gap-4 group"
+                  >
+                    {article.thumbnail && (
+                      <img 
+                        src={`${article.thumbnail}?t=${Date.now()}`} 
+                        alt={article.title}
+                        className="w-40 h-28 object-cover rounded-lg flex-shrink-0 group-hover:opacity-90 transition-opacity"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/160x112?text=No+Image';
+                        }}
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {article.description}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="p-12 text-center">
+                <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">
+                  Chưa có tin tức mới. Vui lòng quay lại sau!
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

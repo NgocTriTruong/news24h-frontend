@@ -12,6 +12,7 @@ import FootballStandingsPage from './pages/FootballStandingsPage';
 import FootballSchedulePage from './pages/FootballSchedulePage';
 import FootballResultsPage from './pages/FootballResultsPage';
 import LunarCalendarPage from './pages/LunarCalendarPage';
+import WeatherPage from './pages/WeatherPage';
 import { useEffect } from "react";
 
 // import LoginPage from './pages/LoginPage';
@@ -54,6 +55,7 @@ const App: React.FC = () => {
             <Route path="/lich-thi-dau" element={<FootballSchedulePage />} />
             <Route path="/ket-qua" element={<FootballResultsPage />} />
             <Route path="/lich-van-nien" element={<LunarCalendarPage />} />
+            <Route path="/category/du-bao-thoi-tiet" element={<WeatherPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/history" element={<ViewedPage />} />
