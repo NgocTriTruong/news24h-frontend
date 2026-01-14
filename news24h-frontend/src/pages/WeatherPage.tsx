@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Cloud, Wind, Droplets, Eye, Gauge, ChevronDown } from 'lucide-react';
 import Loading from '../components/Loading';
 import { Link } from 'react-router-dom';
-import { weatherApi } from '../services/api';
+import { weatherApi, newsApi } from '../services/api';
 import type { WeatherData as ApiWeatherData } from '../services/api';
+import type { NewsArticle } from '../types';
+import NewsCard from '../components/NewsCard';
 
 interface WeatherData {
   city: string;
@@ -46,7 +48,7 @@ const WeatherPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [allCitiesWeather, setAllCitiesWeather] = useState<CityWeather[]>([]);
-  const [airQualityData, setAirQualityData] = useState<Array<{city: string, value: number, status: string}>>([]);
+  const [weatherNews, setWeatherNews] = useState<NewsArticle[]>([]);
 
   const cityMap: Record<string, string> = {
     'ha-noi': 'Hà Nội',
@@ -86,15 +88,7 @@ const WeatherPage: React.FC = () => {
         
         setAllCitiesWeather(transformed);
         
-        // Set air quality data
-        const airQuality = transformed
-          .filter((item: CityWeather) => item.airQuality)
-          .map((item: CityWeather) => ({
-            city: item.city,
-            value: item.airQuality!,
-            status: item.airQualityStatus || '',
-          }));
-        setAirQualityData(airQuality);
+        // AQI section removed; skip building air quality tiles
         
       } catch (error) {
         console.error('Error loading all weather:', error);
@@ -144,6 +138,19 @@ const WeatherPage: React.FC = () => {
     loadWeather();
     window.scrollTo(0, 0);
   }, [selectedCity]);
+
+  useEffect(() => {
+    const loadWeatherNews = async () => {
+      try {
+        const response = await newsApi.getByCategory('du-bao-thoi-tiet', 0, 6);
+        setWeatherNews(response.content || []);
+      } catch (error) {
+        console.error('Error loading weather news:', error);
+      }
+    };
+
+    loadWeatherNews();
+  }, []);
 
   const formatTime = () => {
     return currentTime.toLocaleTimeString('vi-VN', {
@@ -199,55 +206,9 @@ const WeatherPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        {/* Air Quality Index */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          {/* Ribbon header */}
-          <div className="mb-2">
-            <div className="flex items-center">
-              <div className="relative inline-flex items-center">
-                <span className="bg-green-500 text-white font-bold px-4 py-2 rounded-md shadow-sm">Chỉ số không khí</span>
-                <span className="h-6 w-4 bg-green-500 -ml-1 transform skew-x-[-20deg] rounded-r"></span>
-              </div>
-              <div className="flex-1 ml-4 border-b-2 border-green-300"></div>
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-start justify-between gap-6">
-            {/* AQI Tiles */}
-            <div className="flex flex-wrap gap-4">
-              {airQualityData.map((item) => (
-                <div
-                  key={item.city}
-                  className="px-4 py-3 rounded-xl border border-green-300 shadow-sm hover:shadow-md transition hover:-translate-y-0.5 bg-white"
-                >
-                  <div className="text-gray-800 font-semibold text-sm text-center">{item.city}</div>
-                  <div className={`mt-2 px-4 py-1.5 rounded-md font-bold text-center ${getAirQualityColor(item.value)} ring-1 ring-current/20`}> 
-                    {item.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Legend */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-sm bg-green-500 border border-green-600"></span>
-                <span className="text-gray-700 text-sm">Tốt</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-sm bg-orange-400 border border-orange-500"></span>
-                <span className="text-gray-700 text-sm">Xấu</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-sm bg-red-500 border border-red-600"></span>
-                <span className="text-gray-700 text-sm">Kém</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Main Weather Widget */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg p-4 mb-6 text-white">
+        <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg shadow-lg p-4 mb-6 text-white">
           <div className="mb-3">
             <h2 className="text-lg font-bold mb-2">Thời tiết trong ngày</h2>
             <div className="flex items-center gap-4">
@@ -371,43 +332,17 @@ const WeatherPage: React.FC = () => {
           <h2 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b-2 border-red-600 inline-block">
             DỰ BÁO THỜI TIẾT
           </h2>
-          <div className="space-y-3 mt-4">
-            <Link to="/" className="block group">
-              <div className="flex gap-3">
-                <img 
-                  src="https://cdn.24h.com.vn/upload/1-2025/images/2025-01-11/1736544373-607-thumbnail-width620height413.jpg"
-                  alt="Weather news"
-                  className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
-                />
-                <div>
-                  <h3 className="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
-                    Thời tiết hôm nay 11/1: Miền Bắc rét đậm, vùng núi đề phòng băng giá
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2">
-                    Ngày 11/1, thời tiết trên cả nước phổ biến ít mưa, ban ngày có nắng, song rét tiếp tục bao trùm nhiều khu vực...
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <Link to="/" className="block group">
-              <div className="flex gap-3">
-                <img 
-                  src="https://cdn.24h.com.vn/upload/1-2025/images/2025-01-10/1736544373-607-thumbnail-width620height413.jpg"
-                  alt="Weather news"
-                  className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
-                />
-                <div>
-                  <h3 className="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
-                    Hình thái thời tiết rét đậm vào đêm và nắng vào ban ngày ở miền Bắc kéo dài đến khi nào?
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2">
-                    Trong một tuần tới, miền Bắc sẽ tiếp tục duy trì hình thái thời tiết không mưa, ngày nắng...
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </div>
+          {weatherNews.length > 0 ? (
+            <div className="space-y-3 mt-4">
+              {weatherNews.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              Đang tải tin tức...
+            </div>
+          )}
         </div>
       </div>
     </div>
