@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [weatherNews, setWeatherNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -25,6 +26,14 @@ const CategoryPage: React.FC = () => {
         const response = await newsApi.getByCategory(slug, currentPage, 10);
         setArticles(response.content);
         setTotalPages(response.totalPages);
+
+        // Fetch weather news
+        try {
+          const weatherResponse = await newsApi.getByCategory('du-bao-thoi-tiet', 0, 6);
+          setWeatherNews(weatherResponse.content);
+        } catch (err) {
+          console.log('Could not fetch weather news');
+        }
       } catch (err) {
         setError('Không thể tải tin tức. Vui lòng thử lại sau.');
         console.error('Error fetching category news:', err);
@@ -161,6 +170,25 @@ const CategoryPage: React.FC = () => {
               </div>
               <p className="text-gray-600 text-lg font-medium">Không có tin tức nào</p>
               <p className="text-gray-500 text-sm">Danh mục này chưa có tin tức, vui lòng quay lại sau</p>
+            </div>
+          </div>
+        )}
+
+        {/* Weather News Section - Hiển thị trừ trang nóng trên mạng */}
+        {slug !== 'nong-tren-mang' && weatherNews.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-gray-300">
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
+                <h2 className="text-3xl font-bold text-gray-900">Dự báo thời tiết</h2>
+              </div>
+              <p className="text-gray-600 ml-4">Cập nhật dự báo thời tiết hôm nay</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {weatherNews.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
             </div>
           </div>
         )}

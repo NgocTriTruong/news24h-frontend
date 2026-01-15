@@ -120,7 +120,7 @@ interface FootballTeam {
   recentForm: string;
 }
 
-const FOOTBALL_API_BASE_URL = 'http://localhost:8080/api/champions-league';
+const FOOTBALL_API_BASE_URL = 'http://localhost:8080/api/football';
 
 // Helper function: Thay thế logo từ Google sang Wikimedia
 const replaceTeamLogo = (teamName: string, oldLogo: string): string => {
@@ -154,7 +154,7 @@ const replaceTeamLogo = (teamName: string, oldLogo: string): string => {
 export const footballApi = {
   // Lấy bảng xếp hạng theo giải đấu
   getStandings: async (leagueId: string): Promise<FootballTeam[]> => {
-    const response = await fetch(`${FOOTBALL_API_BASE_URL}/standings`);
+    const response = await fetch(`${FOOTBALL_API_BASE_URL}/${leagueId}/standings`);
     if (!response.ok) throw new Error('Failed to fetch standings');
     const data: FootballTeamResponse[] = await response.json();
     
@@ -200,5 +200,57 @@ export const aiApi = {
       history,
     });
     return res.data;
+  },
+};
+
+/**
+ * =========================
+ * Weather API
+ * =========================
+ */
+const WEATHER_API_BASE_URL = 'http://localhost:8080/api/weather';
+
+export interface WeatherData {
+  id: string;
+  city: string;
+  citySlug: string;
+  currentTemp: number;
+  description: string;
+  todayMin: number;
+  todayMax: number;
+  todayDescription: string;
+  tomorrowMin: number;
+  tomorrowMax: number;
+  tomorrowDescription: string;
+  dayAfterMin: number;
+  dayAfterMax: number;
+  dayAfterDescription: string;
+  airQuality?: number;
+  airQualityStatus?: string;
+  updatedAt: string;
+}
+
+export const weatherApi = {
+  // Lấy tất cả thời tiết
+  getAllWeather: async (): Promise<WeatherData[]> => {
+    const response = await fetch(`${WEATHER_API_BASE_URL}`);
+    if (!response.ok) throw new Error('Failed to fetch weather data');
+    return response.json();
+  },
+
+  // Lấy thời tiết theo thành phố
+  getWeatherByCity: async (citySlug: string): Promise<WeatherData> => {
+    const response = await fetch(`${WEATHER_API_BASE_URL}/${citySlug}`);
+    if (!response.ok) throw new Error('Failed to fetch weather for city');
+    return response.json();
+  },
+
+  // Trigger crawl thủ công
+  triggerCrawl: async (): Promise<string> => {
+    const response = await fetch(`${WEATHER_API_BASE_URL}/crawl`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to trigger weather crawl');
+    return response.text();
   },
 };

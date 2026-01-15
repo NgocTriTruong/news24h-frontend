@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Cloud, CloudRain, Sun, Wind, Droplets, Eye, Gauge, ChevronDown } from 'lucide-react';
+import { Cloud, Wind, Droplets, Eye, Gauge, ChevronDown } from 'lucide-react';
 import Loading from '../components/Loading';
 import { Link } from 'react-router-dom';
+import { weatherApi, newsApi } from '../services/api';
+import type { WeatherData as ApiWeatherData } from '../services/api';
+import type { NewsArticle } from '../types';
+import NewsCard from '../components/NewsCard';
 
 interface WeatherData {
   city: string;
@@ -17,10 +21,12 @@ interface WeatherData {
   tomorrowDescription: string;
   dayAfterDescription: string;
   airQuality?: number;
+  airQualityStatus?: string;
 }
 
 interface CityWeather {
   city: string;
+  citySlug: string;
   currentTemp: number | string;
   description: string;
   todayMin: number;
@@ -32,126 +38,65 @@ interface CityWeather {
   dayAfterMin: number;
   dayAfterMax: number;
   dayAfterDesc: string;
+  airQuality?: number;
+  airQualityStatus?: string;
 }
 
 const WeatherPage: React.FC = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [selectedCity, setSelectedCity] = useState('Hà Nội');
+  const [selectedCity, setSelectedCity] = useState('ha-noi');
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [allCitiesWeather, setAllCitiesWeather] = useState<CityWeather[]>([]);
+  const [weatherNews, setWeatherNews] = useState<NewsArticle[]>([]);
 
-  const cities = ['Hà Nội', 'TP.HCM', 'Đà Nẵng', 'Nha Trang', 'Hải Phòng', 'Cần Thơ'];
-
-  const airQualityData = [
-    { city: 'Hà Nội', value: 188, status: 'Xấu' },
-    { city: 'TP HCM', value: 97, status: 'Trung bình' },
-    { city: 'Hải Phòng', value: 156, status: 'Xấu' },
-    { city: 'Nha Trang', value: 61, status: 'Tốt' },
-    { city: 'Đà Nẵng', value: 151, status: 'Xấu' },
-    { city: 'Đà Lạt', value: 130, status: 'Xấu' },
-  ];
-
-  // Dữ liệu thời tiết mẫu cho các thành phố
-  const weatherData: Record<string, CityWeather> = {
-    'Hà Nội': {
-      city: 'Hà Nội',
-      currentTemp: 16,
-      description: 'Đêm có mây',
-      todayMin: 11,
-      todayMax: 23,
-      todayDesc: 'Ít mây, không mưa',
-      tomorrowMin: 12,
-      tomorrowMax: 24,
-      tomorrowDesc: 'Ít mây, không mưa',
-      dayAfterMin: 13,
-      dayAfterMax: 25,
-      dayAfterDesc: 'Ít mây, không mưa',
-    },
-    'TP.HCM': {
-      city: 'TP.HCM',
-      currentTemp: 25,
-      description: 'Đêm nhiều mây',
-      todayMin: 20,
-      todayMax: 30,
-      todayDesc: 'Có mây, không mưa',
-      tomorrowMin: 21,
-      tomorrowMax: 32,
-      tomorrowDesc: 'Có mây, không mưa',
-      dayAfterMin: 23,
-      dayAfterMax: 31,
-      dayAfterDesc: 'Có mây, không mưa',
-    },
-    'Đà Nẵng': {
-      city: 'Đà Nẵng',
-      currentTemp: 18,
-      description: 'Đêm nhiều mây',
-      todayMin: 17,
-      todayMax: 24,
-      todayDesc: 'Nhiều mây, không mưa',
-      tomorrowMin: 15,
-      tomorrowMax: 25,
-      tomorrowDesc: 'Có mây, không mưa',
-      dayAfterMin: 16,
-      dayAfterMax: 25,
-      dayAfterDesc: 'Có mây, không mưa',
-    },
-    'Nha Trang': {
-      city: 'Nha Trang',
-      currentTemp: 23,
-      description: 'Đêm nhiều mây',
-      todayMin: 20,
-      todayMax: 28,
-      todayDesc: 'Có mây, không mưa',
-      tomorrowMin: 22,
-      tomorrowMax: 28,
-      tomorrowDesc: 'Có mây, không mưa',
-      dayAfterMin: 23,
-      dayAfterMax: 29,
-      dayAfterDesc: 'Có mây, không mưa',
-    },
-    'Hải Phòng': {
-      city: 'Hải Phòng',
-      currentTemp: 17,
-      description: 'Đêm có mây',
-      todayMin: 12,
-      todayMax: 23,
-      todayDesc: 'Ít mây, không mưa',
-      tomorrowMin: 14,
-      tomorrowMax: 23,
-      tomorrowDesc: 'Ít mây, không mưa',
-      dayAfterMin: 13,
-      dayAfterMax: 22,
-      dayAfterDesc: 'Ít mây, không mưa',
-    },
-    'Cần Thơ': {
-      city: 'Cần Thơ',
-      currentTemp: 25,
-      description: 'Đêm có mây',
-      todayMin: 21,
-      todayMax: 29,
-      todayDesc: 'Có mây, không mưa',
-      tomorrowMin: 20,
-      tomorrowMax: 29,
-      tomorrowDesc: 'Có mây, không mưa',
-      dayAfterMin: 23,
-      dayAfterMax: 30,
-      dayAfterDesc: 'Có mây, không mưa',
-    },
+  const cityMap: Record<string, string> = {
+    'ha-noi': 'Hà Nội',
+    'tp-hcm': 'TP.HCM',
+    'da-nang': 'Đà Nẵng',
+    'nha-trang': 'Nha Trang',
+    'hai-phong': 'Hải Phòng',
+    'can-tho': 'Cần Thơ',
   };
 
-  const allCitiesWeather: CityWeather[] = [
-    { city: 'Sơn La', currentTemp: 12, description: 'Đêm có mây', todayMin: 7, todayMax: 21, todayDesc: 'Ít mây, không mưa', tomorrowMin: 8, tomorrowMax: 23, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 10, dayAfterMax: 23, dayAfterDesc: 'Ít mây, không mưa' },
-    { city: 'Điện Biên', currentTemp: 'Đang cập nhật', description: '', todayMin: 10, todayMax: 23, todayDesc: 'Có mây, không mưa', tomorrowMin: 12, tomorrowMax: 25, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 11, dayAfterMax: 26, dayAfterDesc: 'Ít mây, không mưa' },
-    { city: 'Hà Giang', currentTemp: 'Đang cập nhật', description: '', todayMin: 13, todayMax: 21, todayDesc: 'Có mây, không mưa', tomorrowMin: 13, tomorrowMax: 22, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 14, dayAfterMax: 24, dayAfterDesc: 'Ít mây, không mưa' },
-    { city: 'Lai Châu', currentTemp: 'Đang cập nhật', description: '', todayMin: 8, todayMax: 21, todayDesc: 'Có mây, không mưa', tomorrowMin: 11, tomorrowMax: 21, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 12, dayAfterMax: 21, dayAfterDesc: 'Ít mây, không mưa' },
-    { city: 'Lào Cai', currentTemp: 'Đang cập nhật', description: '', todayMin: 13, todayMax: 22, todayDesc: 'Có mây, không mưa', tomorrowMin: 12, tomorrowMax: 23, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 16, dayAfterMax: 25, dayAfterDesc: 'Ít mây, không mưa' },
-    { city: 'Thái Nguyên', currentTemp: 'Đang cập nhật', description: '', todayMin: 11, todayMax: 23, todayDesc: 'Ít mây, không mưa', tomorrowMin: 10, tomorrowMax: 24, tomorrowDesc: 'Ít mây, không mưa', dayAfterMin: 12, dayAfterMax: 25, dayAfterDesc: 'Ít mây, không mưa' },
-    { city: 'Vinh', currentTemp: 17, description: 'Đêm có mây', todayMin: 13, todayMax: 22, todayDesc: 'Ít mây, không mưa', tomorrowMin: 13, tomorrowMax: 23, tomorrowDesc: 'Ít mây, không mưa', dayAfterMin: 15, dayAfterMax: 23, dayAfterDesc: 'Có mây, không mưa' },
-    { city: 'Pleiku', currentTemp: 15, description: 'Đêm có mây', todayMin: 12, todayMax: 24, todayDesc: 'Có mây, không mưa', tomorrowMin: 11, tomorrowMax: 26, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 13, dayAfterMax: 26, dayAfterDesc: 'Có mây, không mưa' },
-    { city: 'Đà Lạt', currentTemp: 'Đang cập nhật', description: '', todayMin: 10, todayMax: 22, todayDesc: 'Có mây, không mưa', tomorrowMin: 11, tomorrowMax: 23, tomorrowDesc: 'Nhiều mây, có mưa nhỏ', dayAfterMin: 12, dayAfterMax: 23, dayAfterDesc: 'Có mây, không mưa' },
-    { city: 'Huế', currentTemp: 'Đang cập nhật', description: '', todayMin: 15, todayMax: 24, todayDesc: 'Nhiều mây, không mưa', tomorrowMin: 14, tomorrowMax: 25, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 17, dayAfterMax: 24, dayAfterDesc: 'Có mây, không mưa' },
-    { city: 'Vũng Tàu', currentTemp: 'Đang cập nhật', description: '', todayMin: 22, todayMax: 29, todayDesc: 'Có mây, không mưa', tomorrowMin: 23, tomorrowMax: 30, tomorrowDesc: 'Có mây, không mưa', dayAfterMin: 25, dayAfterMax: 30, dayAfterDesc: 'Có mây, không mưa' },
-  ];
+  const cities = Object.entries(cityMap).map(([slug, name]) => ({ slug, name }));
+
+  // Load tất cả thời tiết khi component mount
+  useEffect(() => {
+    const loadAllWeather = async () => {
+      try {
+        const data = await weatherApi.getAllWeather();
+        
+        // Transform data
+        const transformed: CityWeather[] = data.map((item: ApiWeatherData) => ({
+          city: item.city || '',
+          citySlug: item.citySlug || '',
+          currentTemp: item.currentTemp || 'Đang cập nhật',
+          description: item.description || '',
+          todayMin: item.todayMin || 0,
+          todayMax: item.todayMax || 0,
+          todayDesc: item.todayDescription || '',
+          tomorrowMin: item.tomorrowMin || 0,
+          tomorrowMax: item.tomorrowMax || 0,
+          tomorrowDesc: item.tomorrowDescription || '',
+          dayAfterMin: item.dayAfterMin || 0,
+          dayAfterMax: item.dayAfterMax || 0,
+          dayAfterDesc: item.dayAfterDescription || '',
+          airQuality: item.airQuality,
+          airQualityStatus: item.airQualityStatus,
+        }));
+        
+        setAllCitiesWeather(transformed);
+        
+        // AQI section removed; skip building air quality tiles
+        
+      } catch (error) {
+        console.error('Error loading all weather:', error);
+      }
+    };
+
+    loadAllWeather();
+  }, []);
 
   useEffect(() => {
     // Cập nhật thời gian hiện tại mỗi phút
@@ -165,25 +110,27 @@ const WeatherPage: React.FC = () => {
   useEffect(() => {
     const loadWeather = async () => {
       setLoading(true);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const cityData = weatherData[selectedCity];
-      if (cityData) {
+      try {
+        const data: ApiWeatherData = await weatherApi.getWeatherByCity(selectedCity);
+        
         setWeather({
-          city: cityData.city,
-          currentTemp: cityData.currentTemp as number,
-          description: cityData.description,
-          todayMin: cityData.todayMin,
-          todayMax: cityData.todayMax,
-          tomorrowMin: cityData.tomorrowMin,
-          tomorrowMax: cityData.tomorrowMax,
-          dayAfterMin: cityData.dayAfterMin,
-          dayAfterMax: cityData.dayAfterMax,
-          todayDescription: cityData.todayDesc,
-          tomorrowDescription: cityData.tomorrowDesc,
-          dayAfterDescription: cityData.dayAfterDesc,
+          city: data.city,
+          currentTemp: data.currentTemp,
+          description: data.description,
+          todayMin: data.todayMin,
+          todayMax: data.todayMax,
+          tomorrowMin: data.tomorrowMin,
+          tomorrowMax: data.tomorrowMax,
+          dayAfterMin: data.dayAfterMin,
+          dayAfterMax: data.dayAfterMax,
+          todayDescription: data.todayDescription,
+          tomorrowDescription: data.tomorrowDescription,
+          dayAfterDescription: data.dayAfterDescription,
+          airQuality: data.airQuality,
+          airQualityStatus: data.airQualityStatus,
         });
+      } catch (error) {
+        console.error('Error loading weather:', error);
       }
       setLoading(false);
     };
@@ -191,6 +138,19 @@ const WeatherPage: React.FC = () => {
     loadWeather();
     window.scrollTo(0, 0);
   }, [selectedCity]);
+
+  useEffect(() => {
+    const loadWeatherNews = async () => {
+      try {
+        const response = await newsApi.getByCategory('du-bao-thoi-tiet', 0, 6);
+        setWeatherNews(response.content || []);
+      } catch (error) {
+        console.error('Error loading weather news:', error);
+      }
+    };
+
+    loadWeatherNews();
+  }, []);
 
   const formatTime = () => {
     return currentTime.toLocaleTimeString('vi-VN', {
@@ -246,55 +206,9 @@ const WeatherPage: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        {/* Air Quality Index */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          {/* Ribbon header */}
-          <div className="mb-2">
-            <div className="flex items-center">
-              <div className="relative inline-flex items-center">
-                <span className="bg-green-500 text-white font-bold px-4 py-2 rounded-md shadow-sm">Chỉ số không khí</span>
-                <span className="h-6 w-4 bg-green-500 -ml-1 transform skew-x-[-20deg] rounded-r"></span>
-              </div>
-              <div className="flex-1 ml-4 border-b-2 border-green-300"></div>
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-start justify-between gap-6">
-            {/* AQI Tiles */}
-            <div className="flex flex-wrap gap-4">
-              {airQualityData.map((item) => (
-                <div
-                  key={item.city}
-                  className="px-4 py-3 rounded-xl border border-green-300 shadow-sm hover:shadow-md transition hover:-translate-y-0.5 bg-white"
-                >
-                  <div className="text-gray-800 font-semibold text-sm text-center">{item.city}</div>
-                  <div className={`mt-2 px-4 py-1.5 rounded-md font-bold text-center ${getAirQualityColor(item.value)} ring-1 ring-current/20`}> 
-                    {item.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Legend */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-sm bg-green-500 border border-green-600"></span>
-                <span className="text-gray-700 text-sm">Tốt</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-sm bg-orange-400 border border-orange-500"></span>
-                <span className="text-gray-700 text-sm">Xấu</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-sm bg-red-500 border border-red-600"></span>
-                <span className="text-gray-700 text-sm">Kém</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Main Weather Widget */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg shadow-lg p-4 mb-6 text-white">
+        <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg shadow-lg p-4 mb-6 text-white">
           <div className="mb-3">
             <h2 className="text-lg font-bold mb-2">Thời tiết trong ngày</h2>
             <div className="flex items-center gap-4">
@@ -305,8 +219,8 @@ const WeatherPage: React.FC = () => {
                   className="appearance-none bg-white/20 backdrop-blur-sm text-white font-bold text-sm px-3 py-1.5 pr-8 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
                 >
                   {cities.map((city) => (
-                    <option key={city} value={city} className="text-gray-900">
-                      {city}
+                    <option key={city.slug} value={city.slug} className="text-gray-900">
+                      {city.name}
                     </option>
                   ))}
                 </select>
@@ -370,7 +284,7 @@ const WeatherPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {[...Object.values(weatherData), ...allCitiesWeather].map((city, index) => (
+                {allCitiesWeather.map((city: CityWeather, index: number) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-4 py-2 whitespace-nowrap">
                       <span className="font-medium text-gray-900">{city.city}</span>
@@ -418,43 +332,17 @@ const WeatherPage: React.FC = () => {
           <h2 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b-2 border-red-600 inline-block">
             DỰ BÁO THỜI TIẾT
           </h2>
-          <div className="space-y-3 mt-4">
-            <Link to="/" className="block group">
-              <div className="flex gap-3">
-                <img 
-                  src="https://cdn.24h.com.vn/upload/1-2025/images/2025-01-11/1736544373-607-thumbnail-width620height413.jpg"
-                  alt="Weather news"
-                  className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
-                />
-                <div>
-                  <h3 className="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
-                    Thời tiết hôm nay 11/1: Miền Bắc rét đậm, vùng núi đề phòng băng giá
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2">
-                    Ngày 11/1, thời tiết trên cả nước phổ biến ít mưa, ban ngày có nắng, song rét tiếp tục bao trùm nhiều khu vực...
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <Link to="/" className="block group">
-              <div className="flex gap-3">
-                <img 
-                  src="https://cdn.24h.com.vn/upload/1-2025/images/2025-01-10/1736544373-607-thumbnail-width620height413.jpg"
-                  alt="Weather news"
-                  className="w-24 h-20 object-cover rounded-lg flex-shrink-0"
-                />
-                <div>
-                  <h3 className="font-bold text-sm text-gray-900 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
-                    Hình thái thời tiết rét đậm vào đêm và nắng vào ban ngày ở miền Bắc kéo dài đến khi nào?
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2">
-                    Trong một tuần tới, miền Bắc sẽ tiếp tục duy trì hình thái thời tiết không mưa, ngày nắng...
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </div>
+          {weatherNews.length > 0 ? (
+            <div className="space-y-3 mt-4">
+              {weatherNews.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              Đang tải tin tức...
+            </div>
+          )}
         </div>
       </div>
     </div>
