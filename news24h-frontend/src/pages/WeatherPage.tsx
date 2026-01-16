@@ -7,6 +7,7 @@ import type { WeatherData as ApiWeatherData } from '../services/api';
 import type { NewsArticle } from '../types';
 import NewsCard from '../components/NewsCard';
 
+
 interface WeatherData {
   city: string;
   currentTemp: number;
