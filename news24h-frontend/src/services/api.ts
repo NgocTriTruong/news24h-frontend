@@ -4,7 +4,7 @@ import type { AiChatMessage, AiChatResponse, AiSummaryResponse } from "../types/
 
 //  Axios instance (dùng cho AI)
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://api.animalsfeeds.online",
 });
 // attach token
 api.interceptors.request.use((config) => {
@@ -17,7 +17,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-const API_BASE_URL = 'http://localhost:8080/api/news';
+const API_BASE_URL = 'https://api.animalsfeeds.online/api/news';
 
 export const newsApi = {
   // Lấy tin tức nổi bật
@@ -120,7 +120,7 @@ interface FootballTeam {
   recentForm: string;
 }
 
-const FOOTBALL_API_BASE_URL = 'http://localhost:8080/api/football';
+const FOOTBALL_API_BASE_URL = 'https://api.animalsfeeds.online/api/football';
 
 // Helper function: Thay thế logo từ Google sang Wikimedia
 const replaceTeamLogo = (teamName: string, oldLogo: string): string => {
@@ -208,7 +208,7 @@ export const aiApi = {
  * Weather API
  * =========================
  */
-const WEATHER_API_BASE_URL = 'http://localhost:8080/api/weather';
+const WEATHER_API_BASE_URL = 'https://api.animalsfeeds.online/api/weather';
 
 export interface WeatherData {
   id: string;
