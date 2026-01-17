@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Bookmark, List, Link as LinkIcon, LogOut } from 'lucide-react';
+import FaceEnroll from '../components/FaceEnroll';
 
 const AccountLinksPage: React.FC = () => {
     const [savedCount, setSavedCount] = React.useState(0);
     const [viewedCount, setViewedCount] = React.useState(0);
+    const [showFaceEnroll, setShowFaceEnroll] = React.useState(false);
     const logout = () => {
         localStorage.removeItem('access_token');
         // reload để header nhận trạng thái logout
@@ -23,6 +25,7 @@ const AccountLinksPage: React.FC = () => {
     }, []);
 
   return (
+    <>
     <div className="max-w-5xl mx-auto my-8 px-4">
       <div className="flex gap-6">
         <aside className="w-64">
@@ -60,6 +63,13 @@ const AccountLinksPage: React.FC = () => {
                   <LinkIcon size={16} strokeWidth={2.5} />
                 </div>
                 <Link to="/link-account" className="block py-2 text-green-600 font-medium">Liên kết tài khoản</Link>
+              </li>
+
+              <li className="flex items-center py-2 gap-3">
+                <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white">
+                  <User size={16} strokeWidth={2.5} />
+                </div>
+                <button onClick={() => setShowFaceEnroll(true)} className="block py-2 hover:text-green-600 text-left">Cài đặt khuôn mặt</button>
               </li>
 
               <li className="flex items-center py-2 gap-3">
@@ -133,6 +143,10 @@ const AccountLinksPage: React.FC = () => {
         </section>
       </div>
     </div>
+    {showFaceEnroll && (
+      <FaceEnroll onClose={() => setShowFaceEnroll(false)} />
+    )}
+    </>
   );
 };
 
