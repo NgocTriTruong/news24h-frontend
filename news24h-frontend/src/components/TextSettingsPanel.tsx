@@ -93,8 +93,9 @@ const TextSettingsPanel: React.FC<TextSettingsPanelProps> = ({ onSettingsChange 
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-8 bg-[#78b43d] text-white rounded-full p-4 shadow-lg hover:bg-[#3c811e] transition-all hover:scale-110 z-40"
+        className="fixed right-6 bg-[#78b43d] text-white rounded-full p-4 shadow-lg hover:bg-[#3c811e] transition-all hover:scale-110 z-40"
         title="Chỉnh sửa kiểu chữ"
+        style={{bottom: 160}}
       >
         <Settings size={24} />
       </button>

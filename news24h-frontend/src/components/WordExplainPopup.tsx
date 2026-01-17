@@ -23,6 +23,8 @@ const WordExplainPopup: React.FC<Props> = ({ word, meanings, loading, position, 
     <div
       className="fixed z-50 bg-white shadow-xl border rounded-lg p-4 max-w-sm text-sm"
       style={{ top: position.y + 10, left: position.x + 10 }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
     >
       <div className="flex justify-between items-center mb-2">
         <strong className="text-green-700">{word}</strong>

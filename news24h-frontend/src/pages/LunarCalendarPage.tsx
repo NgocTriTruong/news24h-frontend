@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import * as amlich from 'amlich';
+import { newsApi } from '../services/api';
+import type { NewsArticle } from '../types';
+import { Link } from 'react-router-dom';
 
 interface DayInfo {
   solar: number;
@@ -74,6 +77,8 @@ const LunarCalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(today);
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth());
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
@@ -251,9 +256,79 @@ const LunarCalendarPage = () => {
 
   const dayNames = ['Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy', 'Chủ nhật'];
 
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const response = await newsApi.getTopHeadlines();
+        setArticles(response.slice(0, 10));
+      } catch (err) {
+        console.error('Error fetching news:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNews();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', { 
+      day: '2-digit', 
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-6 max-w-[600px]">
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Sidebar trái - Tin nổi bật */}
+          <div className="hidden lg:block lg:col-span-3">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden sticky top-4">
+              <div className="bg-red-600 px-4 py-3">
+                <h3 className="text-white font-bold uppercase">Tin nổi bật</h3>
+              </div>
+              <div className="p-4 space-y-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+                  </div>
+                ) : (
+                  articles.slice(0, 5).map((article) => (
+                    <Link 
+                      key={article.id} 
+                      to={`/news/${article.id}`}
+                      className="block group"
+                    >
+                      {article.thumbnail && (
+                        <img 
+                          src={article.thumbnail}
+                          alt={article.title}
+                          className="w-full h-32 object-cover rounded-lg mb-2 group-hover:opacity-90 transition-opacity"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=No+Image';
+                          }}
+                        />
+                      )}
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-red-600 transition-colors">
+                        {article.title}
+                      </h4>
+                      <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{formatDate(article.publishedAt)}</span>
+                      </div>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Lịch vạn niên - Giữa */}
+          <div className="lg:col-span-6">
         {/* Header xanh lá */}
         <div className="bg-green-600 text-white rounded-t-lg px-6 py-3">
           <h1 className="text-xl font-bold">LỊCH VẠN NIÊN</h1>
@@ -424,6 +499,56 @@ const LunarCalendarPage = () => {
           <button className="text-gray-700 dark:text-gray-300 font-semibold text-sm hover:text-green-600">
             XEM THÊM CÁC THÔNG TIN KHÁC
           </button>
+        </div>
+          </div>
+
+          {/* Sidebar phải - Tin đọc nhiều */}
+          <div className="hidden lg:block lg:col-span-3">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden sticky top-4">
+              <div className="bg-blue-600 px-4 py-3">
+                <h3 className="text-white font-bold uppercase">Đọc nhiều nhất</h3>
+              </div>
+              <div className="p-4 space-y-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
+                {loading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                  </div>
+                ) : (
+                  articles.slice(5, 10).map((article, index) => (
+                    <Link 
+                      key={article.id} 
+                      to={`/news/${article.id}`}
+                      className="block group"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="relative flex-shrink-0">
+                          {article.thumbnail && (
+                            <img 
+                              src={article.thumbnail}
+                              alt={article.title}
+                              className="w-20 h-20 object-cover rounded-lg group-hover:opacity-90 transition-opacity"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/80x80?text=No+Image';
+                              }}
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            {article.title}
+                          </h4>
+                          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{formatDate(article.publishedAt)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

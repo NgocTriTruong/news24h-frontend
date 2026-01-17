@@ -23,6 +23,8 @@ interface League {
   code: string;
   name: string;
   icon: string;
+  shortName: string;
+  gradient: string;
 }
 
 interface GroupedMatches {
@@ -36,14 +38,51 @@ const FootballSchedulePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const leagues: League[] = [
-    { code: 'ngoai-hang-anh', name: 'Ngoại hạng Anh', icon: '⚽' },
-    { code: 'la-liga', name: 'La Liga', icon: '🇪🇸' },
-    { code: 'serie-a', name: 'Serie A', icon: '🇮🇹' },
-    { code: 'bundesliga', name: 'Bundesliga', icon: '🇩🇪' },
-    { code: 'ligue-1', name: 'Ligue 1', icon: '🇫🇷' },
-    { code: 'cup-c1', name: 'Champions League', icon: '🏆' },
-    { code: 'v-league', name: 'V.League 1', icon: '🇻🇳' },
+    { code: 'ngoai-hang-anh', name: 'Ngoại hạng Anh', icon: '', shortName: 'EPL', gradient: 'from-purple-600 to-pink-500' },
+    { code: 'la-liga', name: 'La Liga', icon: '', shortName: 'LLL', gradient: 'from-red-600 to-orange-500' },
+    { code: 'serie-a', name: 'Serie A', icon: '', shortName: 'SA', gradient: 'from-blue-600 to-cyan-500' },
+    { code: 'bundesliga', name: 'Bundesliga', icon: '', shortName: 'BL', gradient: 'from-red-600 to-gray-800' },
+    { code: 'ligue-1', name: 'Ligue 1', icon: '', shortName: 'L1', gradient: 'from-blue-600 to-blue-800' },
+    { code: 'cup-c1', name: 'Champions League', icon: '', shortName: 'UCL', gradient: 'from-blue-800 to-blue-500' },
+    { code: 'v-league', name: 'V.League 1', icon: '', shortName: 'VL1', gradient: 'from-red-700 to-yellow-500' },
   ];
+
+  // Load local logos from src/assets and pick best match per league by filename pattern
+  const logoFiles = import.meta.glob('../assets/*.{png,jpg,jpeg,svg}', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+  const manualLogoMap: Record<string, string | undefined> = {
+    'ngoai-hang-anh': 'ngoai-hang-anh.png',
+    'la-liga': 'la-liga.png',
+    'serie-a': 'serie-a.png',
+    'bundesliga': 'bundesliga.png',
+    'cup-c1': 'cup-c1.png',
+    'v-league': 'v.league-1.png',
+    'ligue-1': 'ligue-1.png',
+  };
+  const logoPatterns: Record<string, RegExp[]> = {
+    'ngoai-hang-anh': [/premier/, /nha/, /epl/, /anh/],
+    'la-liga': [/la\s*liga/, /laliga/],
+    'v-league': [/v[-_]?league/, /vleague/],
+    'serie-a': [/serie[-_]?a/, /seria[-_]?a/],
+    'cup-c1': [/champ/, /uefa/, /ucl/, /c1/],
+    'bundesliga': [/bundesliga/],
+    'ligue-1': [/ligue/, /league\s*1/, /\bl1\b/],
+  };
+
+  const getLeagueLogo = (leagueCode: string): string | null => {
+    const normalize = (p: string) => p.toLowerCase().split('?')[0];
+    const manual = manualLogoMap[leagueCode];
+    if (manual) {
+      for (const [path, url] of Object.entries(logoFiles)) {
+        if (normalize(path).endsWith(manual.toLowerCase())) return url as string;
+      }
+    }
+    const patterns = logoPatterns[leagueCode] || [];
+    for (const [path, url] of Object.entries(logoFiles)) {
+      const p = normalize(path);
+      if (patterns.some((re) => re.test(p))) return url as string;
+    }
+    return null;
+  };
 
   useEffect(() => {
     fetchMatches();
@@ -54,7 +93,7 @@ const FootballSchedulePage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:8080/api/football/${selectedLeague}/matches`);
+      const response = await fetch(`https://api.animalsfeeds.online/api/football/${selectedLeague}/matches`);
       if (!response.ok) throw new Error('Failed to fetch matches');
       
       const allMatches: Match[] = await response.json();
@@ -224,21 +263,33 @@ const FootballSchedulePage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* League Tabs */}
-            <div className="bg-white rounded-lg shadow-lg mb-6 overflow-x-auto">
-              <div className="flex border-b">
+            <div className="bg-white rounded-lg shadow-lg mb-6 overflow-hidden">
+              <div className="flex overflow-x-auto">
                 {leagues.map((league) => (
                   <button
                     key={league.code}
                     onClick={() => setSelectedLeague(league.code)}
-                    className={`px-6 py-4 font-medium whitespace-nowrap transition-colors ${
+                    className={`flex-shrink-0 px-4 py-3 font-medium border-b-4 transition-colors ${
                       selectedLeague === league.code
-                        ? 'bg-blue-600 text-white border-b-2 border-blue-600'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'border-blue-600 bg-blue-50 text-blue-600'
+                        : 'border-transparent hover:bg-gray-50 text-gray-700'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{league.icon}</span>
-                      <span>{league.name}</span>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="relative w-10 h-10">
+                        {(() => { const url = getLeagueLogo(league.code); return url ? (
+                          <img
+                            src={url}
+                            alt={league.name}
+                            className="w-full h-full object-contain"
+                            loading="lazy"
+                          />) : (
+                          <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
+                            {league.shortName}
+                          </div>
+                        ); })()}
+                      </div>
+                      <span className="text-xs whitespace-nowrap">{league.name}</span>
                     </div>
                   </button>
                 ))}

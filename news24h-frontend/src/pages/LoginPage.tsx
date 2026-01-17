@@ -1,18 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authApi } from "../services/auth";
+import FaceLogin from '../components/FaceLogin';
+import { useAuth } from '../context/AuthContext';
 
 interface LoginPageProps {
   onClose?: () => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
+  const [showFaceLogin, setShowFaceLogin] = useState(false);
+  const { login } = useAuth();
+
+  const handleFaceLoginSuccess = (res: any) => {
+    if (res?.token) {
+      // use auth context to set user from token
+      login(res.token);
+      // tell header to open dropdown after login
+      try { sessionStorage.setItem('openDropdownAfterLogin', '1'); } catch {}
+      setShowFaceLogin(false);
+      onClose?.();
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      {/* MODAL */}
       <div className="relative bg-white w-[420px] rounded-xl shadow-2xl px-8 py-6">
 
-        {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
           aria-label="Close"
@@ -21,7 +35,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
           ✕
         </button>
 
-        {/* LOGO */}
         <div className="flex justify-center mb-4">
           <img
             src="https://cdn.24h.com.vn/images/2023/logo-24h-new.svg"
@@ -30,14 +43,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
           />
         </div>
 
-        {/* TITLE */}
         <h2 className="text-center text-base font-medium text-gray-800 mb-6">
           Đăng nhập 24h bằng tài khoản
         </h2>
 
-        {/* BUTTONS */}
         <div className="space-y-3">
-          {/* GOOGLE */}
           <button
             onClick={authApi.loginGoogle}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
@@ -50,7 +60,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
             <span className="font-medium text-gray-800">Google</span>
           </button>
 
-          {/* FACEBOOK */}
           <button
             onClick={authApi.loginFacebook}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
@@ -63,7 +72,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
             <span className="font-medium text-gray-800">Facebook</span>
           </button>
 
-          {/* ZALO */}
           <button
             onClick={authApi.loginZalo}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
@@ -75,9 +83,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
             />
             <span className="font-medium text-gray-800">Zalo</span>
           </button>
+
+          {/* Face login */}
+          <button
+            onClick={() => setShowFaceLogin(true)}
+            className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
+          >
+            <span className="font-medium text-gray-800">Đăng nhập bằng khuôn mặt</span>
+          </button>
         </div>
 
-        {/* TERMS */}
         <p className="text-xs text-center text-gray-500 mt-6 leading-relaxed">
           Khi thực hiện "Đăng nhập" có nghĩa là bạn đã đồng ý với{' '}
           <Link to="#" className="text-[#78b43d] hover:underline">
@@ -89,6 +104,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onClose }) => {
           </Link>{' '}
           của 24h.com.vn
         </p>
+
+        {showFaceLogin && (
+          <FaceLogin onClose={() => setShowFaceLogin(false)} onSuccess={handleFaceLoginSuccess} />
+        )}
       </div>
     </div>
   );
