@@ -59,6 +59,17 @@ const lookupWord = async (word: string) => {
 
     const res = await fetch(url);
 
+    if (res.status === 404) {
+      setMeanings([
+        {
+          pos: "_",
+          definition: "Không tìm thấy ý nghĩa của từ này",
+          source: ""
+        }
+      ])
+      return;
+    }
+
     if(!res.ok) return;
 
     const data = await res.json();
