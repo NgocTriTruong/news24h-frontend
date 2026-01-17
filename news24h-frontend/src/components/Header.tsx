@@ -20,6 +20,16 @@ const Header: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [savedCount, setSavedCount] = useState(0);
   const [viewedCount, setViewedCount] = useState(0);
+  
+  useEffect(() => {
+    // If login via face just happened, backend/token was set and header should open dropdown
+    try {
+      if (isAuthenticated && sessionStorage.getItem('openDropdownAfterLogin') === '1') {
+        setIsDropdownOpen(true);
+        sessionStorage.removeItem('openDropdownAfterLogin');
+      }
+    } catch {}
+  }, [isAuthenticated]);
 
   //chuyen van bang tu giong noi
   const [isListening, setIsListening] = useState(false);
